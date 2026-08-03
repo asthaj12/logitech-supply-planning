@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Global Supply Planning — Logitech Inc. Demo</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+<style>
+:root{--s0:#f9f9f7;--s1:#fcfcfb;--ink:#0b0b0b;--sec:#52514e;--muted:#898781;--grid:#e1e0d9;--border:rgba(11,11,11,.10);--blue:#6366f1;--orange:#eb6834;--aqua:#1baf7a;--yellow:#eda100;--magenta:#e87ba4;--good:#0ca30c;--warn:#fab219;--crit:#d03b3b;--ind:#6366f1;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:13px;background:var(--s0);color:var(--ink);}
+.demo-banner{background:#fffbeb;border-bottom:2px solid #f59e0b;padding:8px 20px;font-size:12px;font-weight:600;color:#92400e;display:flex;align-items:center;}
+.demo-banner .rs{margin-left:auto;font-weight:400;font-size:11px;color:#78350f;}
+.tab-nav{background:var(--s1);border-bottom:1px solid var(--grid);padding:0 20px;display:flex;gap:2px;}
+.tab-btn{padding:10px 16px;border:none;background:none;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;}
+.tab-btn:hover{color:var(--sec);} .tab-btn.active{color:var(--ind);border-bottom-color:var(--ind);font-weight:600;}
+main{padding:20px;max-width:1300px;margin:0 auto;}
+.tab-panel{display:none;} .tab-panel.active{display:block;}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px;}
+.kpi{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 16px;}
+.kpi .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+.kpi .val{font-size:22px;font-weight:700;margin:4px 0 2px;}
+.kpi .delta{font-size:11px;font-weight:600;}
+.kpi.bl{border-left:3px solid var(--ind);} .kpi.or{border-left:3px solid var(--orange);} .kpi.gd{border-left:3px solid var(--good);}
+.chart-grid{display:grid;gap:16px;} .cols2{grid-template-columns:1fr 1fr;}
+.card{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:16px;}
+.card .ttl{font-size:12px;font-weight:700;margin-bottom:3px;} .card .sub2{font-size:11px;color:var(--muted);margin-bottom:12px;}
+.full{grid-column:1/-1;} canvas{display:block;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{padding:7px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--grid);}
+td{padding:7px 10px;border-bottom:1px solid var(--grid);color:var(--sec);}
+tr:last-child td{border-bottom:none;} tr:hover td{background:#f4f3f0;}
+footer{margin-top:32px;padding:16px 20px;border-top:1px solid var(--grid);font-size:11px;color:var(--muted);display:flex;gap:16px;}
+footer a{color:var(--ind);text-decoration:none;} footer a:hover{text-decoration:underline;}
+
+/* ── Shared nav ─── */
+.snav{position:sticky;top:0;z-index:200;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-bottom:1px solid #e2e8f0;padding:0 20px;display:flex;align-items:center;gap:6px;height:48px;}
+.snav-brand{font-size:13px;font-weight:800;color:#0f172a;text-decoration:none;margin-right:16px;white-space:nowrap;}
+.snav-brand span{color:#6366f1;}
+.snav-items{display:flex;align-items:center;gap:2px;flex:1;}
+.snav-link{padding:5px 10px;border-radius:5px;font-size:12px;font-weight:500;color:#475569;text-decoration:none;white-space:nowrap;transition:background .12s,color .12s;}
+.snav-link:hover{background:rgba(99,102,241,.07);color:#0f172a;}
+.sndrop{position:relative;}
+.sndrop-toggle{display:flex;align-items:center;gap:4px;padding:5px 10px;border-radius:5px;font-size:12px;font-weight:500;color:#475569;cursor:pointer;user-select:none;white-space:nowrap;transition:background .12s,color .12s;}
+.sndrop-toggle:hover{background:rgba(99,102,241,.07);color:#0f172a;}
+.sndrop-toggle svg{width:9px;height:9px;transition:transform .18s;}
+.sndrop:hover .sndrop-toggle svg{transform:rotate(180deg);}
+.sndrop-menu{position:absolute;top:100%;padding-top:6px;margin-top:-6px;left:0;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:5px;min-width:210px;box-shadow:0 12px 40px rgba(0,0,0,.14);opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-4px);transition:opacity .15s,transform .15s,visibility .15s;}
+.sndrop:hover .sndrop-menu{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0);}
+.sndrop-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;font-size:11px;font-weight:500;color:#475569;text-decoration:none;transition:background .1s,color .1s;}
+.sndrop-item:hover{background:rgba(99,102,241,.09);color:#0f172a;}
+.sndrop-icon{width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+.sndrop-lbl{font-weight:600;color:#0f172a;font-size:11px;}
+.sndrop-sub{font-size:10px;color:#94a3b8;margin-top:1px;}
+.sndrop-div{height:1px;background:#e2e8f0;margin:4px 2px;}
+.snav-right{margin-left:auto;display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.snav-badge{padding:4px 12px;border-radius:5px;font-size:11px;font-weight:600;border:1px solid #e2e8f0;color:#475569;text-decoration:none;transition:border-color .12s,color .12s,background .12s;}
+.snav-badge:hover{background:#eef2ff;border-color:#6366f1;color:#6366f1;}
+</style>
+</head>
+<body>
+<!-- ── Shared portfolio nav ── -->
+<nav class="snav">
+  <a href="https://ajwalmart12.github.io" class="snav-brand">AJ<span> · Portfolio</span></a>
+  <div class="snav-items">
+    <div class="sndrop">
+      <div class="sndrop-toggle">Dashboards<svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 3.5l3 3 3-3"/></svg></div>
+      <div class="sndrop-menu">
+        <a class="sndrop-item" href="https://ajwalmart12.github.io/forecast-governance/">
+          <div class="sndrop-icon" style="background:rgba(99,102,241,.12)">📊</div>
+          <div><div class="sndrop-lbl">Forecast Governance</div><div class="sndrop-sub">Anomaly triage · Bias correction</div></div>
+        </a>
+        <a class="sndrop-item" href="https://ajwalmart12.github.io/seasonal-planning/">
+          <div class="sndrop-icon" style="background:rgba(245,158,11,.12)">📅</div>
+          <div><div class="sndrop-lbl">Scenario Planning</div><div class="sndrop-sub">Demand scenarios · Commitment staging</div></div>
+        </a>
+        <a class="sndrop-item" href="https://ajwalmart12.github.io/pricing-demand-response/">
+          <div class="sndrop-icon" style="background:rgba(99,102,241,.12)">💹</div>
+          <div><div class="sndrop-lbl">Pricing &amp; Demand Response</div><div class="sndrop-sub">Elasticity · Lift analysis</div></div>
+        </a>
+        <div class="sndrop-div"></div>
+        <a class="sndrop-item" href="https://ajwalmart12.github.io/forecast-accuracy/">
+          <div class="sndrop-icon" style="background:rgba(16,185,129,.12)">🎯</div>
+          <div><div class="sndrop-lbl">Forecast Accuracy</div><div class="sndrop-sub">Bias · sMAPE · Planner adjustments</div></div>
+        </a>
+        <a class="sndrop-item" href="https://ajwalmart12.github.io/replenishment-risk/">
+          <div class="sndrop-icon" style="background:rgba(244,63,94,.12)">⚡</div>
+          <div><div class="sndrop-lbl">Safety Stock Monitor</div><div class="sndrop-sub">Replenishment risk · Violations</div></div>
+        </a>
+        <a class="sndrop-item" href="https://ajwalmart12.github.io/shopify-demand-forecasting/">
+          <div class="sndrop-icon" style="background:rgba(20,184,166,.12)">🚚</div>
+          <div><div class="sndrop-lbl">Transportation Forecasting</div><div class="sndrop-sub">SKU velocity · Peak planning</div></div>
+        </a>
+        <div class="sndrop-div"></div>
+        <a class="sndrop-item" href="https://ajwalmart12.github.io/logitech-supply-planning/" style="background:rgba(99,102,241,.12)">
+          <div class="sndrop-icon" style="background:rgba(99,102,241,.18)">🏭</div>
+          <div><div class="sndrop-lbl">Supply Planning</div><div class="sndrop-sub">Safety stock · S&amp;OP · NPI</div></div>
+        </a>
+      </div>
+    </div>
+    <a class="snav-link" href="https://ajwalmart12.github.io#projects">Projects</a>
+    <a class="snav-link" href="https://ajwalmart12.github.io#skills">Skills</a>
+  </div>
+  <div class="snav-right">
+    <a class="snav-badge" href="https://linkedin.com/in/asthajain12" target="_blank">LinkedIn ↗</a>
+    <a class="snav-badge" href="https://github.com/ajwalmart12" target="_blank">GitHub ↗</a>
+  </div>
+</nav>
+<div style="background:#f1f5f9;border-bottom:1px solid #e2e8f0;padding:8px 32px;font-size:11px;color:#475569;text-align:center;">
+  <strong>Independent portfolio case study.</strong> All data, scenarios, product identifiers and results shown here are synthetic. This project does not reproduce any employer's data, systems or confidential business processes.
+</div>
+<div class="demo-banner"><span>⚠ DEMO DATA — Illustrative numbers only.</span><span class="rs">Production: 40% availability improvement · ~$200K air freight saved · 15% faster NPI launch</span></div>
+<nav class="tab-nav" id="tabNav">
+  <button class="tab-btn active" data-tab="overview">Supply Overview</button>
+  <button class="tab-btn" data-tab="safetystock">Stochastic Safety Stock</button>
+  <button class="tab-btn" data-tab="sop">S&amp;OP Cadence</button>
+  <button class="tab-btn" data-tab="npi">NPI Launch Tracker</button>
+  <button class="tab-btn" data-tab="expedite">Expedite Risk</button>
+</nav>
+<main>
+
+<!-- ── Tab 1: Supply Overview ── -->
+<div id="tab-overview" class="tab-panel active">
+  <div style="background:#f8f9ff;border-left:3px solid #6366f1;border-radius:8px;padding:16px;margin-bottom:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+    <div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6366f1;margin-bottom:4px;">Decision</div>
+      <div style="font-size:13px;color:#0f172a;">Where are supply-demand imbalances forming across the global portfolio, and which product lines need pre-emptive safety stock or expedite intervention?</div>
+    </div>
+    <div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6366f1;margin-bottom:4px;">Recommendation</div>
+      <div style="font-size:13px;color:#0f172a;">Increase safety stock buffers for Webcam and Headset lines in EMEA ahead of Q4 build season; shift 3 SKUs from air to ocean given recovered lead times.</div>
+    </div>
+    <div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6366f1;margin-bottom:4px;">Evidence</div>
+      <div style="font-size:13px;color:#0f172a;">Availability up 40% since stochastic SS model deployment · Air freight costs down $200K YoY · Lead time variance reduced in APAC</div>
+    </div>
+    <div>
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6366f1;margin-bottom:4px;">Primary Risk</div>
+      <div style="font-size:13px;color:#0f172a;">ODM capacity constraints in Q3 may compress lead times — dual-sourcing for top 10 SKUs recommended.</div>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi bl"><div class="lbl">Portfolio Value</div><div class="val">~$400M</div><div class="delta" style="color:var(--muted)">Global consumer electronics</div></div>
+    <div class="kpi gd"><div class="lbl">Availability Improvement</div><div class="val">+40%</div><div class="delta" style="color:var(--good)">Since SS model deployment</div></div>
+    <div class="kpi or"><div class="lbl">Air Freight Saved</div><div class="val">~$200K</div><div class="delta" style="color:var(--muted)">Year over year</div></div>
+    <div class="kpi bl"><div class="lbl">Regions Managed</div><div class="val">4</div><div class="delta" style="color:var(--muted)">NA · EMEA · APAC · LatAm</div></div>
+    <div class="kpi gd"><div class="lbl">Active Suppliers</div><div class="val">800+</div><div class="delta" style="color:var(--muted)">Across supplier tiers</div></div>
+  </div>
+
+  <div class="chart-grid cols2" style="margin-bottom:16px;">
+    <div class="card full">
+      <div class="ttl">Finished-Goods Availability Rate — 12-Month Trend</div>
+      <div class="sub2">Stochastic safety-stock model deployed Month 4. Availability rose from 62% to 88% over the measurement period.</div>
+      <canvas id="availChart" height="80"></canvas>
+    </div>
+    <div class="card">
+      <div class="ttl">Supply vs. Demand Balance — By Product Line</div>
+      <div class="sub2">Webcams and Headsets are understocked vs. demand. Gaming, Keyboards, and Mice show positive supply buffers.</div>
+      <canvas id="supplyDemandChart" height="240"></canvas>
+    </div>
+    <div class="card">
+      <div class="ttl">On-Time Delivery Rate — By Supplier Tier</div>
+      <div class="sub2">Tier 1 suppliers maintain &gt;96% OTD. Spot suppliers carry highest delivery risk and should be minimized.</div>
+      <canvas id="otdChart" height="240"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ── Tab 2: Stochastic Safety Stock ── -->
+<div id="tab-safetystock" class="tab-panel">
+  <div style="background:#f8f9ff;border-left:3px solid #6366f1;border-radius:8px;padding:16px;margin-bottom:20px;">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6366f1;margin-bottom:6px;">Methodology</div>
+    <div style="font-size:13px;color:#0f172a;line-height:1.6;">Statistical safety-stock models using stochastic lead-time distributions derived from supplier data. Applied probabilistic demand variability estimation to replace static SS formulas — improving finished-goods availability 40% while reducing excess inventory.</div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi gd"><div class="lbl">Overall Fill Rate</div><div class="val">94.2%</div><div class="delta" style="color:var(--good)">Across all product lines</div></div>
+    <div class="kpi bl"><div class="lbl">SS Coverage Days (avg)</div><div class="val">18.4</div><div class="delta" style="color:var(--muted)">Days of safety stock held</div></div>
+    <div class="kpi or"><div class="lbl">Lead Time σ (avg)</div><div class="val">4.2 days</div><div class="delta" style="color:var(--muted)">Across supplier tiers</div></div>
+    <div class="kpi gd"><div class="lbl">Excess SS Reduced</div><div class="val">22%</div><div class="delta" style="color:var(--good)">Vs. static formula baseline</div></div>
+  </div>
+
+  <div class="chart-grid cols2">
+    <div class="card full">
+      <div class="ttl">Lead Time Distribution — By Supplier Tier (Simulated from Supplier Data)</div>
+      <div class="sub2">Tier 1 (tight, μ=14d) · Tier 2 (wider, μ=21d) · Tier 3 (wide/skewed, μ=28d). Stochastic SS calibrated to these distributions.</div>
+      <canvas id="ltDistChart" height="80"></canvas>
+    </div>
+    <div class="card">
+      <div class="ttl">Safety Stock Days vs. Demand Variability — By Product Line</div>
+      <div class="sub2">Higher demand CoV requires proportionally higher SS. Each dot = one SKU. Lines show regression by category.</div>
+      <canvas id="ssScatterChart" height="240"></canvas>
+    </div>
+    <div class="card">
+      <div class="ttl">Fill Rate Before vs. After Stochastic Model — By Product Line</div>
+      <div class="sub2">All lines saw material fill-rate improvement after static SS formulas were replaced with stochastic models.</div>
+      <canvas id="fillRateChart" height="240"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ── Tab 3: S&OP Cadence ── -->
+<div id="tab-sop" class="tab-panel">
+  <div style="background:#f8f9ff;border-left:3px solid #6366f1;border-radius:8px;padding:16px;margin-bottom:20px;">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6366f1;margin-bottom:6px;">Process Context</div>
+    <div style="font-size:13px;color:#0f172a;line-height:1.6;">Weekly S&amp;OP cadence across supply chain, finance, and regional operations teams. SQL-based demand signal pipeline synthesizing POS, sell-in, and backorder data across international DCs to surface demand-supply gaps for cross-regional decisions.</div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi bl"><div class="lbl">Review Cadence</div><div class="val">Weekly</div><div class="delta" style="color:var(--muted)">Cross-functional S&amp;OP</div></div>
+    <div class="kpi gd"><div class="lbl">Regions Aligned</div><div class="val">4</div><div class="delta" style="color:var(--muted)">NA · EMEA · APAC · LatAm</div></div>
+    <div class="kpi or"><div class="lbl">Plan Revision Cycles</div><div class="val">−38%</div><div class="delta" style="color:var(--good)">Fewer re-plans per cycle</div></div>
+    <div class="kpi gd"><div class="lbl">Demand-Supply Gap</div><div class="val">&lt;3%</div><div class="delta" style="color:var(--good)">Current steady state</div></div>
+  </div>
+
+  <div class="chart-grid cols2">
+    <div class="card full">
+      <div class="ttl">Weekly Demand-Supply Gap % — 52-Week Trend</div>
+      <div class="sub2">Gap narrows after S&amp;OP pipeline deployed (Week 8). Steady-state gap below 3% achieved by Q3.</div>
+      <canvas id="sopGapChart" height="80"></canvas>
+    </div>
+    <div class="card">
+      <div class="ttl">Plan Accuracy — By Region</div>
+      <div class="sub2">North America leads at 94.2%. LatAm shows greatest improvement opportunity due to data latency.</div>
+      <canvas id="planAccChart" height="240"></canvas>
+    </div>
+    <div class="card">
+      <div class="ttl">S&amp;OP Milestone Calendar — Monthly Cycle</div>
+      <div class="sub2">Standard 4-week cadence: data pull → demand review → supply review → pre-S&amp;OP → exec S&amp;OP → deployment</div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>Week</th><th>Milestone</th><th>Owner</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>POS &amp; Inventory Data Pull</td><td>Supply Analytics</td><td style="color:var(--good);font-weight:600;">✅ Complete</td></tr>
+            <tr><td>1</td><td>Demand Signal Integration</td><td>Demand Planning</td><td style="color:var(--good);font-weight:600;">✅ Complete</td></tr>
+            <tr><td>2</td><td>Demand Review Meeting</td><td>Demand Planning</td><td style="color:var(--warn);font-weight:600;">🔄 In Progress</td></tr>
+            <tr><td>2</td><td>Supply Review Meeting</td><td>Supply Planning</td><td style="color:var(--warn);font-weight:600;">🔄 In Progress</td></tr>
+            <tr><td>3</td><td>Pre-S&amp;OP Cross-functional</td><td>All Teams</td><td style="color:var(--muted);font-weight:600;">⏳ Scheduled</td></tr>
+            <tr><td>4</td><td>Executive S&amp;OP &amp; Deployment</td><td>Leadership</td><td style="color:var(--muted);font-weight:600;">⏳ Upcoming</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Tab 4: NPI Launch Tracker ── -->
+<div id="tab-npi" class="tab-panel">
+  <div style="background:#f8f9ff;border-left:3px solid #6366f1;border-radius:8px;padding:16px;margin-bottom:20px;">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6366f1;margin-bottom:6px;">NPI Context</div>
+    <div style="font-size:13px;color:#0f172a;line-height:1.6;">NPI launch planning for custom tablet peripherals with ODM/contract manufacturing partners — managing material readiness, capacity ramp-up, and phase-in/phase-out planning. Accelerated launch delivery by 15%.</div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi bl"><div class="lbl">Active NPIs</div><div class="val">8</div><div class="delta" style="color:var(--muted)">In pipeline</div></div>
+    <div class="kpi gd"><div class="lbl">On Track</div><div class="val">5</div><div class="delta" style="color:var(--good)">Within schedule</div></div>
+    <div class="kpi or"><div class="lbl">At Risk</div><div class="val">2</div><div class="delta" style="color:var(--crit)">Need intervention</div></div>
+    <div class="kpi gd"><div class="lbl">Avg Launch Acceleration</div><div class="val">15%</div><div class="delta" style="color:var(--good)">Vs. prior NPI baseline</div></div>
+  </div>
+
+  <div class="chart-grid cols2">
+    <div class="card full">
+      <div class="ttl">NPI Timeline — Phase Gantt (Months from Program Start)</div>
+      <div class="sub2">Design Lock → Prototype → DVT → PVT → MP Ramp. Product C and E are at risk due to ODM capacity constraints.</div>
+      <canvas id="ganttChart" height="100"></canvas>
+    </div>
+    <div class="card">
+      <div class="ttl">Material Readiness — By NPI Program</div>
+      <div class="sub2">Product E (61%) and Product C (72%) are below 80% readiness threshold and require expedite action.</div>
+      <canvas id="matReadinessChart" height="240"></canvas>
+    </div>
+    <div class="card">
+      <div class="ttl">NPI Status Summary</div>
+      <div class="sub2">Status as of current review cycle. At-Risk items flagged for cross-functional escalation.</div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>Product</th><th>ODM Partner</th><th>Launch Target</th><th>Status</th><th>Risk</th><th>Lead Time</th></tr></thead>
+          <tbody>
+            <tr><td>Product A</td><td>Foxconn</td><td>Q2 2021</td><td style="color:var(--good);font-weight:600;">On Track</td><td style="color:var(--good);">Low</td><td>14 wks</td></tr>
+            <tr><td>Product B</td><td>Pegatron</td><td>Q3 2021</td><td style="color:var(--good);font-weight:600;">On Track</td><td style="color:var(--good);">Low</td><td>16 wks</td></tr>
+            <tr><td>Product C</td><td>Compal</td><td>Q2 2021</td><td style="color:var(--crit);font-weight:600;">At Risk</td><td style="color:var(--crit);">High</td><td>12 wks</td></tr>
+            <tr><td>Product D</td><td>Foxconn</td><td>Q4 2021</td><td style="color:var(--good);font-weight:600;">On Track</td><td style="color:var(--good);">Low</td><td>18 wks</td></tr>
+            <tr><td>Product E</td><td>Wistron</td><td>Q1 2022</td><td style="color:var(--warn);font-weight:600;">At Risk</td><td style="color:var(--warn);">Medium</td><td>20 wks</td></tr>
+            <tr><td>Product F</td><td>Pegatron</td><td>Q3 2021</td><td style="color:var(--good);font-weight:600;">On Track</td><td style="color:var(--good);">Low</td><td>15 wks</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Tab 5: Expedite Risk ── -->
+<div id="tab-expedite" class="tab-panel">
+  <div style="background:#f8f9ff;border-left:3px solid #6366f1;border-radius:8px;padding:16px;margin-bottom:20px;">
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6366f1;margin-bottom:6px;">Freight Optimization Context</div>
+    <div style="font-size:13px;color:#0f172a;line-height:1.6;">Air freight vs. ocean freight cost analysis. Data-driven dual-sourcing and stochastic safety stock models reduced reliance on air expedites, saving ~$200K in freight costs annually while maintaining service levels.</div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi or"><div class="lbl">Air Freight (Current)</div><div class="val">$180K</div><div class="delta" style="color:var(--muted)">Annual run rate</div></div>
+    <div class="kpi bl"><div class="lbl">Previous Year</div><div class="val">$380K</div><div class="delta" style="color:var(--muted)">Before SS optimization</div></div>
+    <div class="kpi gd"><div class="lbl">Savings</div><div class="val">~$200K</div><div class="delta" style="color:var(--good)">Year-over-year reduction</div></div>
+    <div class="kpi or"><div class="lbl">Items at Expedite Risk</div><div class="val">14</div><div class="delta" style="color:var(--warn)">Require mode review</div></div>
+  </div>
+
+  <div class="chart-grid cols2">
+    <div class="card full">
+      <div class="ttl">Monthly Freight Spend — Air vs. Ocean ($K)</div>
+      <div class="sub2">Safety stock optimization (Month 4) drove rapid reduction in air expedites. Ocean share increased as lead time buffers improved.</div>
+      <canvas id="freightTrendChart" height="80"></canvas>
+    </div>
+    <div class="card">
+      <div class="ttl">Transport Mode Mix — By Region (%)</div>
+      <div class="sub2">APAC and LatAm still carry higher air-freight exposure; dual-sourcing initiatives underway to shift to ocean.</div>
+      <canvas id="transportModeChart" height="240"></canvas>
+    </div>
+    <div class="card">
+      <div class="ttl">Items at Expedite Risk</div>
+      <div class="sub2">14 SKUs identified as high expedite risk. Recommended actions: dual-source, increase SS, or pre-position to regional DC.</div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>SKU</th><th>Product Line</th><th>DC</th><th>LT Remaining</th><th>Risk</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td style="font-family:monospace;font-size:11px">LGT-29871</td><td>Webcams</td><td>EMEA-AMS</td><td style="color:var(--crit);font-weight:600;">3 days</td><td style="color:var(--crit);font-weight:600;">🔴 Critical</td><td style="font-size:11px">Emergency air — pre-approve</td></tr>
+            <tr><td style="font-family:monospace;font-size:11px">LGT-44302</td><td>Headsets</td><td>EMEA-LON</td><td style="color:var(--crit);font-weight:600;">5 days</td><td style="color:var(--crit);font-weight:600;">🔴 Critical</td><td style="font-size:11px">Dual-source activation</td></tr>
+            <tr><td style="font-family:monospace;font-size:11px">LGT-12891</td><td>Gaming</td><td>NA-DFW</td><td style="color:var(--warn);font-weight:600;">8 days</td><td style="color:var(--warn);font-weight:600;">🟡 Warning</td><td style="font-size:11px">Increase SS by 5 days</td></tr>
+            <tr><td style="font-family:monospace;font-size:11px">LGT-51204</td><td>Webcams</td><td>APAC-SGP</td><td style="color:var(--warn);font-weight:600;">10 days</td><td style="color:var(--warn);font-weight:600;">🟡 Warning</td><td style="font-size:11px">Monitor daily</td></tr>
+            <tr><td style="font-family:monospace;font-size:11px">LGT-18293</td><td>Tablet Acc</td><td>LatAm-GRU</td><td style="color:var(--warn);font-weight:600;">12 days</td><td style="color:var(--warn);font-weight:600;">🟡 Warning</td><td style="font-size:11px">Pre-position to hub DC</td></tr>
+            <tr><td style="font-family:monospace;font-size:11px">LGT-67831</td><td>Mice</td><td>NA-SEA</td><td style="color:var(--good);font-weight:600;">18 days</td><td style="color:var(--good);font-weight:600;">🟢 Monitor</td><td style="font-size:11px">Ocean feasible — shift mode</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  <span>⚠ Demo data</span>
+  <a href="https://ajwalmart12.github.io" target="_blank">📄 Portfolio →</a>
+  <span style="margin-left:auto">Astha Jain · <a href="https://linkedin.com/in/asthajain12" target="_blank">LinkedIn</a></span>
+</footer>
+
+<script>
+const C={blue:'#6366f1',orange:'#eb6834',aqua:'#1baf7a',yellow:'#eda100',magenta:'#e87ba4',good:'#0ca30c',warn:'#fab219',crit:'#d03b3b',grid:'#e1e0d9',muted:'#898781',text:'#52514e'};
+const base={responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false},tooltip:{backgroundColor:'#fff',borderColor:C.grid,borderWidth:1,titleColor:'#0b0b0b',bodyColor:C.text,padding:10,boxPadding:4}},scales:{x:{grid:{color:C.grid,lineWidth:.5},ticks:{color:C.muted,font:{size:11}}},y:{grid:{color:C.grid,lineWidth:.5},ticks:{color:C.muted,font:{size:11}},border:{dash:[3,3]}}}};
+
+// ── Tab 1: Availability Rate Trend ──
+const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const availData=[62,63,64,67,72,76,80,83,85,86,87,88];
+new Chart(document.getElementById('availChart'),{type:'line',data:{labels:months,datasets:[
+  {label:'Availability Rate %',data:availData,borderColor:C.blue,backgroundColor:C.blue+'22',fill:true,borderWidth:2,pointRadius:4,tension:.35}
+]},options:{...base,plugins:{...base.plugins,annotation:{annotations:{ssLine:{type:'line',xMin:3,xMax:3,borderColor:C.crit,borderWidth:1.5,borderDash:[4,3],label:{display:true,content:'Stochastic SS model deployed',font:{size:10,weight:'bold'},color:C.crit,position:'start',backgroundColor:'rgba(255,255,255,.9)',padding:4}}}}},scales:{x:base.scales.x,y:{...base.scales.y,min:50,max:100,title:{display:true,text:'Availability Rate %',font:{size:11},color:C.muted}}}}});
+
+// ── Tab 1: Supply vs Demand by Product Line ──
+const pLines=['Gaming','Webcams','Headsets','Keyboards','Mice','Tablet Acc'];
+new Chart(document.getElementById('supplyDemandChart'),{type:'bar',data:{labels:pLines,datasets:[
+  {label:'Supply',data:[4200,3800,2900,5100,6200,1400],backgroundColor:C.blue+'cc',borderRadius:3,borderSkipped:false},
+  {label:'Demand',data:[4100,4100,3200,4800,5900,1200],backgroundColor:C.orange+'cc',borderRadius:3,borderSkipped:false}
+]},options:{...base,plugins:{...base.plugins,legend:{display:true,labels:{font:{size:11},color:C.text,boxWidth:8,padding:8}}},scales:{x:base.scales.x,y:{...base.scales.y,title:{display:true,text:'Units (000s)',font:{size:11},color:C.muted}}}}});
+
+// ── Tab 1: OTD by Supplier Tier ──
+new Chart(document.getElementById('otdChart'),{type:'bar',data:{labels:['Tier 1','Tier 2','Tier 3','Spot'],datasets:[
+  {data:[96.2,89.4,81.2,72.8],backgroundColor:[C.good+'cc',C.aqua+'cc',C.warn+'cc',C.crit+'cc'],borderRadius:4,borderSkipped:false}
+]},options:{...base,indexAxis:'y',scales:{x:{...base.scales.x,min:60,max:100,title:{display:true,text:'On-Time Delivery Rate %',font:{size:11},color:C.muted}},y:base.scales.y}}});
+
+// ── Tab 2: Lead Time Distribution ──
+function normalPDF(x,mu,sigma){return(1/(sigma*Math.sqrt(2*Math.PI)))*Math.exp(-0.5*Math.pow((x-mu)/sigma,2));}
+const ltDays=Array.from({length:56},(_,i)=>i+5);
+new Chart(document.getElementById('ltDistChart'),{type:'line',data:{labels:ltDays,datasets:[
+  {label:'Tier 1 (μ=14d, tight)',data:ltDays.map(x=>normalPDF(x,14,2)),borderColor:C.good,backgroundColor:C.good+'18',fill:true,borderWidth:2,pointRadius:0,tension:.4},
+  {label:'Tier 2 (μ=21d, wider)',data:ltDays.map(x=>normalPDF(x,21,5)),borderColor:C.blue,backgroundColor:C.blue+'18',fill:true,borderWidth:2,pointRadius:0,tension:.4},
+  {label:'Tier 3 (μ=28d, skewed)',data:ltDays.map(x=>normalPDF(x,28,8)),borderColor:C.orange,backgroundColor:C.orange+'18',fill:true,borderWidth:2,pointRadius:0,tension:.4},
+]},options:{...base,plugins:{...base.plugins,legend:{display:true,labels:{font:{size:11},color:C.text,boxWidth:8,padding:8}}},scales:{x:{...base.scales.x,title:{display:true,text:'Lead Time (Days)',font:{size:11},color:C.muted},ticks:{maxTicksLimit:12,color:C.muted,font:{size:11}}},y:{...base.scales.y,title:{display:true,text:'Frequency (Probability Density)',font:{size:11},color:C.muted}}}}});
+
+// ── Tab 2: SS vs Demand CoV Scatter ──
+new Chart(document.getElementById('ssScatterChart'),{type:'scatter',data:{datasets:[
+  {label:'Gaming',data:[{x:.18,y:12},{x:.22,y:14},{x:.25,y:16},{x:.20,y:13},{x:.23,y:15}],backgroundColor:C.blue+'cc',pointRadius:7},
+  {label:'Webcams',data:[{x:.35,y:20},{x:.40,y:24},{x:.38,y:22},{x:.42,y:25},{x:.36,y:21}],backgroundColor:C.orange+'cc',pointRadius:7},
+  {label:'Headsets',data:[{x:.28,y:17},{x:.32,y:19},{x:.30,y:18},{x:.33,y:20},{x:.29,y:17}],backgroundColor:C.aqua+'cc',pointRadius:7},
+  {label:'Keyboards',data:[{x:.12,y:9},{x:.15,y:10},{x:.14,y:10},{x:.16,y:11},{x:.13,y:9}],backgroundColor:C.yellow+'cc',pointRadius:7},
+  {label:'Mice',data:[{x:.10,y:8},{x:.12,y:9},{x:.11,y:8},{x:.13,y:9},{x:.10,y:7}],backgroundColor:C.magenta+'cc',pointRadius:7},
+  {label:'Tablet Acc',data:[{x:.44,y:28},{x:.48,y:31},{x:.46,y:29},{x:.50,y:33},{x:.45,y:29}],backgroundColor:'#64748b'+'cc',pointRadius:7},
+]},options:{...base,plugins:{...base.plugins,legend:{display:true,labels:{font:{size:11},color:C.text,boxWidth:8,padding:6}}},scales:{x:{...base.scales.x,min:0,max:.6,title:{display:true,text:'Demand Coefficient of Variation (CoV)',font:{size:11},color:C.muted}},y:{...base.scales.y,min:0,max:40,title:{display:true,text:'Safety Stock Days',font:{size:11},color:C.muted}}}}});
+
+// ── Tab 2: Fill Rate Before/After ──
+new Chart(document.getElementById('fillRateChart'),{type:'bar',data:{labels:['Gaming','Webcams','Headsets','Keyboards','Mice','Tablet Acc'],datasets:[
+  {label:'Before (Static SS)',data:[71,58,62,79,83,74],backgroundColor:C.crit+'88',borderRadius:3,borderSkipped:false},
+  {label:'After (Stochastic)',data:[92,88,91,96,97,93],backgroundColor:C.good+'aa',borderRadius:3,borderSkipped:false}
+]},options:{...base,indexAxis:'y',plugins:{...base.plugins,legend:{display:true,labels:{font:{size:11},color:C.text,boxWidth:8,padding:8}}},scales:{x:{...base.scales.x,min:40,max:100,title:{display:true,text:'Fill Rate %',font:{size:11},color:C.muted}},y:base.scales.y}}});
+
+// ── Tab 3: S&OP Demand-Supply Gap ──
+const sopWks=Array.from({length:52},(_,i)=>`Wk ${i+1}`);
+const sopData=Array.from({length:52},(_,i)=>{
+  if(i<8)return 7.2+Math.sin(i*1.4)*.6;
+  const t=(i-8)/43;
+  return Math.max(2.2,6.8-t*4.6+Math.sin(i*.9)*.55);
+});
+new Chart(document.getElementById('sopGapChart'),{type:'line',data:{labels:sopWks,datasets:[
+  {label:'Demand-Supply Gap %',data:sopData,borderColor:C.blue,backgroundColor:C.blue+'22',fill:true,borderWidth:2,pointRadius:0,tension:.3}
+]},options:{...base,plugins:{...base.plugins,annotation:{annotations:{sopLine:{type:'line',xMin:7,xMax:7,borderColor:C.good,borderWidth:1.5,borderDash:[4,3],label:{display:true,content:'S&OP pipeline deployed',font:{size:10,weight:'bold'},color:C.good,position:'start',backgroundColor:'rgba(255,255,255,.9)',padding:4}}}}},scales:{x:{...base.scales.x,ticks:{maxTicksLimit:13,color:C.muted,font:{size:11}}},y:{...base.scales.y,min:0,max:12,title:{display:true,text:'Demand-Supply Gap %',font:{size:11},color:C.muted}}}}});
+
+// ── Tab 3: Plan Accuracy by Region ──
+new Chart(document.getElementById('planAccChart'),{type:'bar',data:{labels:['North America','EMEA','APAC','LatAm'],datasets:[
+  {data:[94.2,91.8,88.4,86.1],backgroundColor:[C.good+'cc',C.warn+'cc',C.warn+'cc',C.crit+'cc'],borderRadius:4,borderSkipped:false}
+]},options:{...base,indexAxis:'y',scales:{x:{...base.scales.x,min:80,max:100,title:{display:true,text:'Plan Accuracy %',font:{size:11},color:C.muted}},y:base.scales.y}}});
+
+// ── Tab 4: NPI Gantt (stacked horizontal bar) ──
+const npiProducts=['Product A','Product B','Product C','Product D','Product E','Product F'];
+const ganttOffsets=[0,1,0,2,3,1];
+const ganttDL=[1,1,2,1,1.5,1];
+const ganttProto=[1,1.5,2,1,2,1];
+const ganttDVT=[2,2,3,2,2.5,2];
+const ganttPVT=[1.5,1.5,2,1.5,1.5,1];
+const ganttMP=[1.5,2,2,1.5,1.5,2];
+new Chart(document.getElementById('ganttChart'),{type:'bar',data:{labels:npiProducts,datasets:[
+  {label:'',data:ganttOffsets,backgroundColor:'transparent',borderColor:'transparent',borderSkipped:false},
+  {label:'Design Lock',data:ganttDL,backgroundColor:'#94a3b8cc',borderRadius:2,borderSkipped:false},
+  {label:'Prototype',data:ganttProto,backgroundColor:C.blue+'cc',borderRadius:2,borderSkipped:false},
+  {label:'DVT',data:ganttDVT,backgroundColor:C.yellow+'cc',borderRadius:2,borderSkipped:false},
+  {label:'PVT',data:ganttPVT,backgroundColor:C.aqua+'cc',borderRadius:2,borderSkipped:false},
+  {label:'MP Ramp',data:ganttMP,backgroundColor:C.orange+'cc',borderRadius:2,borderSkipped:false},
+]},options:{...base,indexAxis:'y',plugins:{...base.plugins,legend:{display:true,labels:{filter:item=>item.datasetIndex>0,font:{size:11},color:C.text,boxWidth:8,padding:8}}},scales:{x:{...base.scales.x,stacked:true,min:0,max:13,title:{display:true,text:'Months from Program Start',font:{size:11},color:C.muted}},y:{...base.scales.y,stacked:true}}}});
+
+// ── Tab 4: Material Readiness ──
+const matPct=[96,88,72,94,61,83];
+new Chart(document.getElementById('matReadinessChart'),{type:'bar',data:{labels:['Product A','Product B','Product C','Product D','Product E','Product F'],datasets:[
+  {data:matPct,backgroundColor:matPct.map(v=>v>=90?C.good+'cc':v>=80?C.warn+'cc':C.crit+'cc'),borderRadius:4,borderSkipped:false}
+]},options:{...base,indexAxis:'y',plugins:{...base.plugins,annotation:{annotations:{thresh90:{type:'line',scaleID:'x',value:90,borderColor:C.good,borderWidth:1.5,borderDash:[4,3],label:{display:true,content:'Target 90%',font:{size:10},color:C.good,position:'end'}},thresh80:{type:'line',scaleID:'x',value:80,borderColor:C.warn,borderWidth:1.5,borderDash:[4,3],label:{display:true,content:'Min 80%',font:{size:10},color:C.warn,position:'end'}}}}},scales:{x:{...base.scales.x,min:40,max:100,title:{display:true,text:'Material Readiness %',font:{size:11},color:C.muted}},y:base.scales.y}}});
+
+// ── Tab 5: Monthly Freight Spend ──
+const freightMonths=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const airSpend=[42,40,38,35,25,18,15,14,13,12,12,14];
+const oceanSpend=[65,68,70,72,82,90,96,100,102,105,106,103];
+new Chart(document.getElementById('freightTrendChart'),{type:'bar',data:{labels:freightMonths,datasets:[
+  {label:'Air Freight ($K)',data:airSpend,backgroundColor:C.crit+'bb',borderRadius:3,borderSkipped:false},
+  {label:'Ocean Freight ($K)',data:oceanSpend,backgroundColor:C.blue+'88',borderRadius:3,borderSkipped:false},
+]},options:{...base,plugins:{...base.plugins,legend:{display:true,labels:{font:{size:11},color:C.text,boxWidth:8,padding:8}},annotation:{annotations:{optLine:{type:'line',xMin:3,xMax:3,borderColor:C.muted,borderWidth:1.5,borderDash:[4,3],label:{display:true,content:'SS optimization',font:{size:10,weight:'bold'},color:C.muted,position:'start',backgroundColor:'rgba(255,255,255,.9)',padding:4}}}}},scales:{x:base.scales.x,y:{...base.scales.y,title:{display:true,text:'Monthly Spend ($K)',font:{size:11},color:C.muted}}}}});
+
+// ── Tab 5: Transport Mode by Region ──
+new Chart(document.getElementById('transportModeChart'),{type:'bar',data:{labels:['North America','EMEA','APAC','LatAm'],datasets:[
+  {label:'Air %',data:[15,25,35,45],backgroundColor:C.crit+'cc',borderRadius:3,borderSkipped:false},
+  {label:'Ocean %',data:[85,75,65,55],backgroundColor:C.blue+'cc',borderRadius:3,borderSkipped:false}
+]},options:{...base,plugins:{...base.plugins,legend:{display:true,labels:{font:{size:11},color:C.text,boxWidth:8,padding:8}}},scales:{x:{...base.scales.x,stacked:true},y:{...base.scales.y,stacked:true,max:100,title:{display:true,text:'Transport Mode Share %',font:{size:11},color:C.muted}}}}});
+
+// ── Tab switching ──
+document.getElementById('tabNav').addEventListener('click',e=>{
+  const btn=e.target.closest('.tab-btn');if(!btn)return;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+});
+</script>
+</body>
+</html>
