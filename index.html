@@ -2,452 +2,931 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Global Supply Planning — Logitech Inc. Demo</title>
+<meta name="description" content="Global S&amp;OP case study: gaming E&amp;O management, supply disruption and expedite, S&amp;OP cadence, and integrated view. Illustrative demo data."/>
+<link rel="canonical" href="https://asthaj12.github.io/logitech-supply-planning/"/>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f172a'/%3E%3Ctext x='32' y='41' text-anchor='middle' font-family='system-ui,Arial,sans-serif' font-size='26' font-weight='800' fill='%23818cf8'%3EAJ%3C/text%3E%3C/svg%3E"/>
+<meta property="og:type" content="website"/>
+<meta property="og:title" content="Logitech Global S&OP — Gaming E&O · Supply Disruption · Decision Forum"/>
+<meta property="og:description" content="Global S&amp;OP case study: gaming E&amp;O management, supply disruption and expedite, S&amp;OP cadence, and integrated view. Illustrative demo data."/>
+<meta property="og:url" content="https://asthaj12.github.io/logitech-supply-planning/"/>
+<meta property="og:image" content="https://asthaj12.github.io/assets/portfolio-share.png"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Logitech Global S&OP — Gaming E&O · Supply Disruption · Decision Forum"/>
+<meta name="twitter:description" content="Global S&amp;OP case study: gaming E&amp;O management, supply disruption and expedite, S&amp;OP cadence, and integrated view. Illustrative demo data."/>
+<meta name="twitter:image" content="https://asthaj12.github.io/assets/portfolio-share.png"/>
+<title>Logitech Global S&OP — Gaming E&O · Supply Disruption · Decision Forum</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 <style>
-:root{--s0:#f9f9f7;--s1:#fcfcfb;--ink:#0b0b0b;--sec:#52514e;--muted:#898781;--grid:#e1e0d9;--border:rgba(11,11,11,.10);--blue:#6366f1;--orange:#eb6834;--aqua:#1baf7a;--yellow:#eda100;--magenta:#e87ba4;--good:#0ca30c;--warn:#fab219;--crit:#d03b3b;--ind:#6366f1;}
+:root{
+  --s0:#f9f9f7;--s1:#fcfcfb;--ink:#0b0b0b;--sec:#52514e;--muted:#898781;
+  --grid:#e1e0d9;--border:rgba(11,11,11,.10);
+  --blue:#6366f1;--orange:#eb6834;--aqua:#1baf7a;--yellow:#eda100;
+  --pink:#e87ba4;--violet:#4a3aa7;
+  --good:#0ca30c;--warn:#fab219;--crit:#d03b3b;
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;font-size:13px;background:var(--s0);color:var(--ink);}
-.demo-banner{background:#fffbeb;border-bottom:2px solid #f59e0b;padding:8px 20px;font-size:12px;font-weight:600;color:#92400e;display:flex;align-items:center;}
+
+
+/* ── Banners ── */
+.conf-banner{background:#f1f5f9;border-bottom:1px solid #e2e8f0;padding:7px 24px;font-size:11px;color:#475569;text-align:center;}
+.conf-banner strong{color:#0f172a;}
+.demo-banner{background:#fffbeb;border-bottom:2px solid #f59e0b;padding:8px 24px;font-size:12px;font-weight:600;color:#92400e;display:flex;align-items:center;gap:8px;}
 .demo-banner .rs{margin-left:auto;font-weight:400;font-size:11px;color:#78350f;}
-.tab-nav{background:var(--s1);border-bottom:1px solid var(--grid);padding:0 20px;display:flex;gap:2px;}
-.tab-btn{padding:10px 16px;border:none;background:none;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;}
-.tab-btn:hover{color:var(--sec);} .tab-btn.active{color:var(--ind);border-bottom-color:var(--ind);font-weight:600;}
-main{padding:20px;max-width:1300px;margin:0 auto;}
+
+/* ── Tab nav ── */
+.tab-nav{background:var(--s1);border-bottom:1px solid var(--grid);padding:0 20px;display:flex;gap:2px;overflow-x:auto;}
+.tab-btn{padding:10px 16px;border:none;background:none;font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;white-space:nowrap;flex-shrink:0;}
+.tab-btn:hover{color:var(--sec);}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:600;}
+
+/* ── Layout ── */
+main{padding:20px;max-width:1340px;margin:0 auto;}
 .tab-panel{display:none;} .tab-panel.active{display:block;}
-.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px;}
+
+/* ── KPI row ── */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;}
 .kpi{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:14px 16px;}
-.kpi .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
-.kpi .val{font-size:22px;font-weight:700;margin:4px 0 2px;}
-.kpi .delta{font-size:11px;font-weight:600;}
-.kpi.bl{border-left:3px solid var(--ind);} .kpi.or{border-left:3px solid var(--orange);} .kpi.gd{border-left:3px solid var(--good);}
-.chart-grid{display:grid;gap:16px;} .cols2{grid-template-columns:1fr 1fr;}
+.kpi .lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;line-height:1.3;}
+.kpi .val{font-size:22px;font-weight:700;margin:4px 0 2px;line-height:1.1;}
+.kpi .sub{font-size:11px;font-weight:500;color:var(--muted);}
+.kpi.bl{border-left:3px solid var(--blue);}
+.kpi.or{border-left:3px solid var(--orange);}
+.kpi.gd{border-left:3px solid var(--good);}
+.kpi.rd{border-left:3px solid var(--crit);}
+.kpi.yw{border-left:3px solid var(--yellow);}
+
+/* ── Chart cards ── */
+.chart-grid{display:grid;gap:16px;margin-bottom:16px;}
+.cols2{grid-template-columns:1fr 1fr;}
+.cols3{grid-template-columns:1fr 1fr 1fr;}
 .card{background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:16px;}
-.card .ttl{font-size:12px;font-weight:700;margin-bottom:3px;} .card .sub2{font-size:11px;color:var(--muted);margin-bottom:12px;}
-.full{grid-column:1/-1;} canvas{display:block;}
+.card .ttl{font-size:12px;font-weight:700;margin-bottom:2px;color:var(--ink);}
+.card .sub2{font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.4;}
+.full{grid-column:1/-1;}
+canvas{display:block;width:100%!important;}
+
+/* ── Decision callout ── */
+.decision-box{background:#f8f9ff;border-left:3px solid var(--blue);border-radius:8px;padding:16px 20px;margin-bottom:20px;}
+.decision-box .dt{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--blue);margin-bottom:5px;}
+.decision-box p{font-size:13px;color:#0f172a;line-height:1.6;}
+
+/* ── Timeline ── */
+.timeline{display:grid;grid-template-columns:repeat(5,1fr);gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-top:8px;}
+.tl-step{padding:14px 12px;background:var(--s1);border-right:1px solid var(--grid);position:relative;}
+.tl-step:last-child{border-right:none;}
+.tl-day{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--blue);margin-bottom:4px;}
+.tl-title{font-size:11px;font-weight:600;color:var(--ink);margin-bottom:4px;}
+.tl-desc{font-size:10px;color:var(--muted);line-height:1.4;}
+.tl-arrow{position:absolute;right:-10px;top:50%;transform:translateY(-50%);color:var(--blue);font-size:14px;z-index:1;}
+
+/* ── Callout cards row ── */
+.callout-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px;}
+.callout-card{background:#f8f9ff;border:1px solid rgba(99,102,241,.2);border-radius:8px;padding:16px;}
+.callout-card .num{font-size:26px;font-weight:800;color:var(--blue);margin-bottom:4px;}
+.callout-card .ttl2{font-size:11px;font-weight:700;color:var(--ink);margin-bottom:4px;}
+.callout-card p{font-size:11px;color:var(--sec);line-height:1.5;}
+
+/* ── Table ── */
 table{width:100%;border-collapse:collapse;font-size:12px;}
 th{padding:7px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--grid);}
 td{padding:7px 10px;border-bottom:1px solid var(--grid);color:var(--sec);}
-tr:last-child td{border-bottom:none;} tr:hover td{background:#f4f3f0;}
-footer{margin-top:32px;padding:16px 20px;border-top:1px solid var(--grid);font-size:11px;color:var(--muted);display:flex;gap:16px;}
-footer a{color:var(--ind);text-decoration:none;} footer a:hover{text-decoration:underline;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#f4f3f0;}
 
-/* ── Shared nav ─── */
-.snav{position:sticky;top:0;z-index:200;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-bottom:1px solid #e2e8f0;padding:0 20px;display:flex;align-items:center;gap:6px;height:48px;}
+/* ── Footer ── */
+footer{margin-top:32px;padding:16px 20px;border-top:1px solid var(--grid);font-size:11px;color:var(--muted);display:flex;gap:16px;align-items:center;}
+footer a{color:var(--blue);text-decoration:none;}
+footer a:hover{text-decoration:underline;}
+
+@media(max-width:768px){
+  .cols2,.cols3{grid-template-columns:1fr;}
+  .callout-row{grid-template-columns:1fr;}
+  .timeline{grid-template-columns:1fr;border-radius:8px;}
+  .tl-step{border-right:none;border-bottom:1px solid var(--grid);}
+  .tl-step:last-child{border-bottom:none;}
+  .tl-arrow{display:none;}
+}
+:root{--nav-h:48px;}
+.snav{position:sticky;top:0;z-index:200;background:rgba(249,249,247,.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:6px 20px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;min-height:48px;}
+.snav ul{list-style:none;margin:0;padding:0;}
 .snav-brand{font-size:13px;font-weight:800;color:#0f172a;text-decoration:none;margin-right:16px;white-space:nowrap;}
-.snav-brand span{color:#6366f1;}
-.snav-items{display:flex;align-items:center;gap:2px;flex:1;}
-.snav-link{padding:5px 10px;border-radius:5px;font-size:12px;font-weight:500;color:#475569;text-decoration:none;white-space:nowrap;transition:background .12s,color .12s;}
-.snav-link:hover{background:rgba(99,102,241,.07);color:#0f172a;}
+.snav-brand span{color:var(--blue);}
+.snav-menu,.snav-items,.snav-right{display:flex;align-items:center;gap:2px;}
+.snav-items{flex:1;min-width:0;}
+.snav-right{margin-left:auto;gap:6px;flex-shrink:0;}
+.snav-link,#snDrop>summary{display:flex;align-items:center;min-height:32px;padding:5px 10px;border-radius:5px;font-size:12px;font-weight:500;color:#475569;text-decoration:none;white-space:nowrap;transition:background .12s,color .12s;}
 .sndrop{position:relative;}
-.sndrop-toggle{display:flex;align-items:center;gap:4px;padding:5px 10px;border-radius:5px;font-size:12px;font-weight:500;color:#475569;cursor:pointer;user-select:none;white-space:nowrap;transition:background .12s,color .12s;}
-.sndrop-toggle:hover{background:rgba(99,102,241,.07);color:#0f172a;}
-.sndrop-toggle svg{width:9px;height:9px;transition:transform .18s;}
-.sndrop:hover .sndrop-toggle svg{transform:rotate(180deg);}
-.sndrop-menu{position:absolute;top:100%;padding-top:6px;margin-top:-6px;left:0;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:5px;min-width:210px;box-shadow:0 12px 40px rgba(0,0,0,.14);opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-4px);transition:opacity .15s,transform .15s,visibility .15s;}
-.sndrop:hover .sndrop-menu{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0);}
-.sndrop-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;font-size:11px;font-weight:500;color:#475569;text-decoration:none;transition:background .1s,color .1s;}
-.sndrop-item:hover{background:rgba(99,102,241,.09);color:#0f172a;}
+#snDrop>summary{cursor:pointer;user-select:none;gap:4px;list-style:none;}
+#snDrop>summary::-webkit-details-marker{display:none;}
+.snav-link:hover,#snDrop>summary:hover,#snDrop[open]>summary{background:rgba(99,102,241,.07);color:#0f172a;}
+#snDrop>summary svg{width:9px;height:9px;flex-shrink:0;transition:transform .18s;}
+#snDrop[open]>summary svg{transform:rotate(180deg);}
+.sndrop-menu{position:absolute;top:calc(100% + 6px);left:0;z-index:210;width:300px;max-width:calc(100vw - 24px);max-height:min(70vh,520px);overflow-y:auto;overscroll-behavior:contain;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:5px;box-shadow:0 12px 40px rgba(0,0,0,.14);}
+.sndrop-gh{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8;padding:8px 10px 3px;}
+.sndrop-grp+.sndrop-grp{margin-top:4px;border-top:1px solid #e2e8f0;}
+.sndrop-item{display:flex;align-items:center;gap:8px;min-height:40px;padding:6px 10px;border-radius:6px;font-size:11px;font-weight:500;color:#475569;text-decoration:none;transition:background .1s,color .1s;}
+.sndrop-item:hover,.sndrop-item[aria-current]{background:rgba(99,102,241,.09);color:#0f172a;}
 .sndrop-icon{width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
 .sndrop-lbl{font-weight:600;color:#0f172a;font-size:11px;}
 .sndrop-sub{font-size:10px;color:#94a3b8;margin-top:1px;}
-.sndrop-div{height:1px;background:#e2e8f0;margin:4px 2px;}
-.snav-right{margin-left:auto;display:flex;align-items:center;gap:6px;flex-shrink:0;}
-.snav-badge{padding:4px 12px;border-radius:5px;font-size:11px;font-weight:600;border:1px solid #e2e8f0;color:#475569;text-decoration:none;transition:border-color .12s,color .12s,background .12s;}
+.snav-badge{display:flex;align-items:center;min-height:32px;padding:4px 12px;border-radius:5px;font-size:11px;font-weight:600;border:1px solid #e2e8f0;color:#475569;text-decoration:none;white-space:nowrap;transition:border-color .12s,color .12s,background .12s;}
 .snav-badge:hover{background:#eef2ff;border-color:#6366f1;color:#6366f1;}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;}
+.tab-bar,.tab-nav{position:sticky;top:var(--nav-h,48px);z-index:190;}
+main,.tab-pane,.card{min-width:0;}
+@media (max-width:600px){
+:root{--nav-h:96px;}
+.snav{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:2px 8px;padding:6px 12px;}
+.snav-brand{grid-column:1;grid-row:1;justify-self:start;margin:0;display:flex;align-items:center;min-height:40px;}
+.snav-menu{grid-column:2;grid-row:1;justify-self:end;}
+.sndrop{position:static;}
+.sndrop-menu{left:12px;right:12px;width:auto;max-width:none;}
+.snav-items{grid-column:1;grid-row:2;justify-self:start;flex:none;}
+.snav-right{grid-column:2;grid-row:2;justify-self:end;margin-left:0;}
+.snav-link,#snDrop>summary,.snav-badge,.tab-btn{min-height:40px;}
+.tab-bar,.tab-nav{padding-left:12px;padding-right:12px;}
+main{padding:14px;}
+}
 </style>
 </head>
 <body>
+
 <!-- ── Shared portfolio nav ── -->
-<nav class="snav">
-  <a href="https://asthaj12.github.io" class="snav-brand">AJ<span> · Portfolio</span></a>
-  <div class="snav-items">
-    <div class="sndrop">
-      <div class="sndrop-toggle">Dashboards<svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 3.5l3 3 3-3"/></svg></div>
-      <div class="sndrop-menu">
-        <a class="sndrop-item" href="https://asthaj12.github.io/forecast-governance/">
-          <div class="sndrop-icon" style="background:rgba(99,102,241,.12)">📊</div>
-          <div><div class="sndrop-lbl">Forecast Governance</div><div class="sndrop-sub">Anomaly triage · Bias correction</div></div>
-        </a>
-        <a class="sndrop-item" href="https://asthaj12.github.io/seasonal-planning/">
-          <div class="sndrop-icon" style="background:rgba(245,158,11,.12)">📅</div>
-          <div><div class="sndrop-lbl">Scenario Planning</div><div class="sndrop-sub">Demand scenarios · Commitment staging</div></div>
-        </a>
-        <a class="sndrop-item" href="https://asthaj12.github.io/pricing-demand-response/">
-          <div class="sndrop-icon" style="background:rgba(99,102,241,.12)">💹</div>
-          <div><div class="sndrop-lbl">Pricing &amp; Demand Response</div><div class="sndrop-sub">Elasticity · Lift analysis</div></div>
-        </a>
-        <div class="sndrop-div"></div>
-        <a class="sndrop-item" href="https://asthaj12.github.io/forecast-accuracy/">
-          <div class="sndrop-icon" style="background:rgba(16,185,129,.12)">🎯</div>
-          <div><div class="sndrop-lbl">Forecast Accuracy</div><div class="sndrop-sub">Bias · sMAPE · Planner adjustments</div></div>
-        </a>
-        <a class="sndrop-item" href="https://asthaj12.github.io/replenishment-risk/">
-          <div class="sndrop-icon" style="background:rgba(244,63,94,.12)">⚡</div>
-          <div><div class="sndrop-lbl">Safety Stock Monitor</div><div class="sndrop-sub">Replenishment risk · Violations</div></div>
-        </a>
-        <a class="sndrop-item" href="https://asthaj12.github.io/shopify-demand-forecasting/">
-          <div class="sndrop-icon" style="background:rgba(20,184,166,.12)">🚚</div>
-          <div><div class="sndrop-lbl">Transportation Forecasting</div><div class="sndrop-sub">SKU velocity · Peak planning</div></div>
-        </a>
-        <div class="sndrop-div"></div>
-        <a class="sndrop-item" href="https://asthaj12.github.io/logitech-supply-planning/" style="background:rgba(99,102,241,.12)">
-          <div class="sndrop-icon" style="background:rgba(99,102,241,.18)">🏭</div>
-          <div><div class="sndrop-lbl">Supply Planning</div><div class="sndrop-sub">Safety stock · S&amp;OP · NPI</div></div>
-        </a>
-      </div>
-    </div>
-    <a class="snav-link" href="https://asthaj12.github.io#projects">Projects</a>
-    <a class="snav-link" href="https://asthaj12.github.io#skills">Skills</a>
-  </div>
-  <div class="snav-right">
-    <a class="snav-badge" href="https://linkedin.com/in/asthajain12" target="_blank">LinkedIn ↗</a>
-    <a class="snav-badge" href="https://github.com/asthaj12" target="_blank">GitHub ↗</a>
-  </div>
+<nav class="snav" aria-label="Portfolio and dashboard navigation">
+  <a href="https://asthaj12.github.io/" class="snav-brand">AJ<span> · Portfolio</span></a>
+  <ul class="snav-menu">
+    <li class="sndrop">
+      <details id="snDrop">
+        <summary>Dashboards<svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><path d="M2 3.5l3 3 3-3"/></svg></summary>
+        <div class="sndrop-menu">
+          <div class="sndrop-grp">
+            <p class="sndrop-gh">Capacity &amp; Supply</p>
+            <ul>
+            <li><a class="sndrop-item" href="https://asthaj12.github.io/ai-customer-strategy-lab/"><div class="sndrop-icon" style="background:rgba(99,102,241,.12)">🧭</div><div><div class="sndrop-lbl">Cloud AI Strategy Lab</div><div class="sndrop-sub">Long-tail AI customers · Unit economics · Capacity pooling</div></div></a></li>
+              <li><a class="sndrop-item" href="https://asthaj12.github.io/cummins-capacity-expansion/"><div class="sndrop-icon" style="background:rgba(99,102,241,.12)">📈</div><div><div class="sndrop-lbl">Long-Range Capacity Planning</div><div class="sndrop-sub">Long-range planning · $12M protected · 15+ lines</div></div></a></li>
+              <li><a class="sndrop-item" href="https://asthaj12.github.io/cummins-capacity-risk/"><div class="sndrop-icon" style="background:rgba(235,104,52,.13)">🏭</div><div><div class="sndrop-lbl">Cummins Capacity &amp; Risk</div><div class="sndrop-sub">Supplier risk · Recovery · $35M averted</div></div></a></li>
+              <li><a class="sndrop-item" href="https://asthaj12.github.io/npi-launch-planning/"><div class="sndrop-icon" style="background:rgba(235,104,52,.13)">🚀</div><div><div class="sndrop-lbl">NPI Launch Planning</div><div class="sndrop-sub">New product intro · Supply readiness</div></div></a></li>
+              <li><a class="sndrop-item" href="https://asthaj12.github.io/replenishment-risk/"><div class="sndrop-icon" style="background:rgba(237,161,0,.12)">📦</div><div><div class="sndrop-lbl">Safety Stock Monitor</div><div class="sndrop-sub">Violation monitor · Risk items</div></div></a></li>
+              <li><a class="sndrop-item" href="https://asthaj12.github.io/logitech-supply-planning/" aria-current="page"><div class="sndrop-icon" style="background:rgba(235,104,52,.13)">🌐</div><div><div class="sndrop-lbl">Global S&amp;OP</div><div class="sndrop-sub">Gaming E&amp;O · Supply disruption · Decision forum</div></div></a></li>
+              <li><a class="sndrop-item" href="https://asthaj12.github.io/shopify-demand-forecasting/"><div class="sndrop-icon" style="background:rgba(99,102,241,.12)">🔀</div><div><div class="sndrop-lbl">Network Demand Planning</div><div class="sndrop-sub">Network overview · Forecast RCA · BFCM peak</div></div></a></li>
+            </ul>
+          </div>
+          <div class="sndrop-grp">
+            <p class="sndrop-gh">Forecasting &amp; Decisions</p>
+            <ul>
+              <li><a class="sndrop-item" href="https://asthaj12.github.io/forecast-governance/"><div class="sndrop-icon" style="background:rgba(99,102,241,.12)">📊</div><div><div class="sndrop-lbl">Forecast Governance</div><div class="sndrop-sub">Anomaly triage · Bias correction</div></div></a></li>
+              <li><a class="sndrop-item" href="https://asthaj12.github.io/fom-backtesting/"><div class="sndrop-icon" style="background:rgba(27,175,122,.12)">🧪</div><div><div class="sndrop-lbl">FOM Backtesting</div><div class="sndrop-sub">Model validation · Historical accuracy</div></div></a></li>
+              <li><a class="sndrop-item" href="https://asthaj12.github.io/forecast-accuracy/"><div class="sndrop-icon" style="background:rgba(27,175,122,.12)">📉</div><div><div class="sndrop-lbl">Forecast Accuracy</div><div class="sndrop-sub">Period recap · Bias by category · Planner adjustments</div></div></a></li>
+              <li><a class="sndrop-item" href="https://asthaj12.github.io/seasonal-event-intelligence/"><div class="sndrop-icon" style="background:rgba(237,161,0,.12)">🎯</div><div><div class="sndrop-lbl">Seasonal Event Intelligence</div><div class="sndrop-sub">Event lift · Demand signals</div></div></a></li>
+              <li><a class="sndrop-item" href="https://asthaj12.github.io/seasonal-planning/"><div class="sndrop-icon" style="background:rgba(99,102,241,.12)">📅</div><div><div class="sndrop-lbl">Scenario Planning</div><div class="sndrop-sub">Scenario dashboard · Planning calendar · Risk flags</div></div></a></li>
+              <li><a class="sndrop-item" href="https://asthaj12.github.io/pricing-demand-response/"><div class="sndrop-icon" style="background:rgba(232,123,164,.14)">💲</div><div><div class="sndrop-lbl">Pricing &amp; Demand Response</div><div class="sndrop-sub">Elasticity &amp; lift · Price event tracking</div></div></a></li>
+              <li><a class="sndrop-item" href="https://asthaj12.github.io/fifa-2026-demand/"><div class="sndrop-icon" style="background:rgba(27,175,122,.12)">⚽</div><div><div class="sndrop-lbl">FIFA Demand</div><div class="sndrop-sub">Host city proximity · Team affinity · Staged commitment</div></div></a></li>
+              <li><a class="sndrop-item" href="https://asthaj12.github.io/snap-monitoring/"><div class="sndrop-icon" style="background:rgba(99,102,241,.12)">📜</div><div><div class="sndrop-lbl">Policy Demand Signals</div><div class="sndrop-sub">Test &amp; control · Demand signal · Hypothesis testing</div></div></a></li>
+            </ul>
+          </div>
+        </div>
+      </details>
+    </li>
+  </ul>
+  <ul class="snav-items">
+    <li><a class="snav-link" href="https://asthaj12.github.io/#projects">Projects</a></li>
+    <li><a class="snav-link" href="https://asthaj12.github.io/#skills">Skills</a></li>
+  </ul>
+  <ul class="snav-right">
+    <li><a class="snav-badge" href="https://linkedin.com/in/asthajain12" target="_blank" rel="noopener">LinkedIn ↗</a></li>
+    <li><a class="snav-badge" href="https://github.com/asthaj12" target="_blank" rel="noopener">GitHub ↗</a></li>
+  </ul>
 </nav>
-<div style="background:#f1f5f9;border-bottom:1px solid #e2e8f0;padding:8px 32px;font-size:11px;color:#475569;text-align:center;">
-  <strong>Independent portfolio case study.</strong> All data, scenarios, product identifiers and results shown here are synthetic. This project does not reproduce any employer's data, systems or confidential business processes.
-</div>
-<div class="demo-banner"><span>⚠ DEMO DATA — Illustrative numbers only.</span><span class="rs">Production: 40% availability improvement · ~$200K air freight saved · 15% faster NPI launch</span></div>
+<script>
+(function(){
+var nav=document.querySelector('.snav');
+var dd=document.getElementById('snDrop');
+function setNavH(){document.documentElement.style.setProperty('--nav-h',nav.offsetHeight+'px');}
+if(window.ResizeObserver){new ResizeObserver(setNavH).observe(nav);}else{setNavH();window.addEventListener('resize',setNavH);}
+dd.addEventListener('focusout',function(e){if(e.relatedTarget&&!dd.contains(e.relatedTarget)){dd.open=false;}});
+document.addEventListener('pointerdown',function(e){if(dd.open&&!dd.contains(e.target)){dd.open=false;}});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&dd.open){dd.open=false;dd.querySelector('summary').focus();}});
+})();
+</script>
+
+<div class="conf-banner"><strong>Independent portfolio case study.</strong> All data, scenarios, identifiers, and results shown here are synthetic. This project does not reproduce any employer's data, systems, or confidential business processes.</div>
+<div class="demo-banner">⚠ DEMO DATA — Illustrative numbers only. Logitech Inc. · Mar 2020 – Feb 2022 · ~$400M portfolio<span class="rs">~7% revenue growth · ~$1M E&amp;O reduction · ~$200K premium freight saved</span></div>
+
 <nav class="tab-nav" id="tabNav">
-  <button class="tab-btn active" data-tab="overview">Supply Overview</button>
-  <button class="tab-btn" data-tab="safetystock">Stochastic Safety Stock</button>
-  <button class="tab-btn" data-tab="sop">S&amp;OP Cadence</button>
-  <button class="tab-btn" data-tab="npi">NPI Launch Tracker</button>
-  <button class="tab-btn" data-tab="expedite">Expedite Risk</button>
+  <button class="tab-btn active" data-tab="overview">Portfolio Overview</button>
+  <button class="tab-btn" data-tab="gaming">Gaming E&amp;O Management</button>
+  <button class="tab-btn" data-tab="disruption">Supply Disruption &amp; Expedite</button>
+  <button class="tab-btn" data-tab="sop">Global S&amp;OP Cadence</button>
+  <button class="tab-btn" data-tab="integrated">Integrated View</button>
 </nav>
+
 <main>
 
-<!-- ── Tab 1: Supply Overview ── -->
+<!-- ═══════════════════════════════════════════════
+     TAB 1 · Portfolio Overview
+═══════════════════════════════════════════════ -->
 <div id="tab-overview" class="tab-panel active">
-  <div style="background:#f8f9ff;border-left:3px solid #6366f1;border-radius:8px;padding:16px;margin-bottom:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-    <div>
-      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6366f1;margin-bottom:4px;">Decision</div>
-      <div style="font-size:13px;color:#0f172a;">Where are supply-demand imbalances forming across the global portfolio, and which product lines need pre-emptive safety stock or expedite intervention?</div>
-    </div>
-    <div>
-      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6366f1;margin-bottom:4px;">Recommendation</div>
-      <div style="font-size:13px;color:#0f172a;">Increase safety stock buffers for Webcam and Headset lines in EMEA ahead of Q4 build season; shift 3 SKUs from air to ocean given recovered lead times.</div>
-    </div>
-    <div>
-      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6366f1;margin-bottom:4px;">Evidence</div>
-      <div style="font-size:13px;color:#0f172a;">Availability up 40% since stochastic SS model deployment · Air freight costs down $200K YoY · Lead time variance reduced in APAC</div>
-    </div>
-    <div>
-      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6366f1;margin-bottom:4px;">Primary Risk</div>
-      <div style="font-size:13px;color:#0f172a;">ODM capacity constraints in Q3 may compress lead times — dual-sourcing for top 10 SKUs recommended.</div>
-    </div>
+
+  <div class="decision-box">
+    <div class="dt">S&amp;OP Principle</div>
+    <p>"The S&amp;OP room is where you decide whether excess is a supply problem or a demand problem. Gaming's excess was a demand problem — you can't factory-cut your way out of aging inventory. GTM commercial actions are the only lever."</p>
   </div>
 
   <div class="kpi-row">
-    <div class="kpi bl"><div class="lbl">Portfolio Value</div><div class="val">~$400M</div><div class="delta" style="color:var(--muted)">Global consumer electronics</div></div>
-    <div class="kpi gd"><div class="lbl">Availability Improvement</div><div class="val">+40%</div><div class="delta" style="color:var(--good)">Since SS model deployment</div></div>
-    <div class="kpi or"><div class="lbl">Air Freight Saved</div><div class="val">~$200K</div><div class="delta" style="color:var(--muted)">Year over year</div></div>
-    <div class="kpi bl"><div class="lbl">Regions Managed</div><div class="val">4</div><div class="delta" style="color:var(--muted)">NA · EMEA · APAC · LatAm</div></div>
-    <div class="kpi gd"><div class="lbl">Active Suppliers</div><div class="val">800+</div><div class="delta" style="color:var(--muted)">Across supplier tiers</div></div>
+    <div class="kpi bl"><div class="lbl">Portfolio Size</div><div class="val">~$400M</div><div class="sub">Logitech managed scope</div></div>
+    <div class="kpi gd"><div class="lbl">Revenue Growth</div><div class="val">+7%</div><div class="sub">YoY despite Gaming decline</div></div>
+    <div class="kpi gd"><div class="lbl">E&amp;O Reduction</div><div class="val">~$1M</div><div class="sub">Annual run-rate improvement</div></div>
+    <div class="kpi rd"><div class="lbl">Gaming Decline Absorbed</div><div class="val">−17%</div><div class="sub">YoY post-COVID normalization</div></div>
+    <div class="kpi or"><div class="lbl">Premium Freight Saved</div><div class="val">~$200K</div><div class="sub">Margin-weighted prioritization</div></div>
   </div>
 
-  <div class="chart-grid cols2" style="margin-bottom:16px;">
-    <div class="card full">
-      <div class="ttl">Finished-Goods Availability Rate — 12-Month Trend</div>
-      <div class="sub2">Stochastic safety-stock model deployed Month 4. Availability rose from 62% to 88% over the measurement period.</div>
-      <canvas id="availChart" height="80"></canvas>
+  <div class="chart-grid cols2">
+    <div class="card">
+      <div class="ttl">Revenue vs. Prior Year — By Region</div>
+      <div class="sub2">Overall portfolio grew 7% despite Gaming's 17% YoY decline. Productivity and Video lines offset the shortfall. Figures are indexed; Gaming weight shown in mix chart.</div>
+      <canvas id="c1_revenue" height="220"></canvas>
     </div>
     <div class="card">
-      <div class="ttl">Supply vs. Demand Balance — By Product Line</div>
-      <div class="sub2">Webcams and Headsets are understocked vs. demand. Gaming, Keyboards, and Mice show positive supply buffers.</div>
-      <canvas id="supplyDemandChart" height="240"></canvas>
+      <div class="ttl">E&amp;O Trajectory — 12-Month Trend</div>
+      <div class="sub2">E&amp;O peaked before GTM actions were formalized. Pull-forwards and promotional bundles cleared the backlog faster than supply cuts alone.</div>
+      <canvas id="c1_eao" height="220"></canvas>
     </div>
     <div class="card">
-      <div class="ttl">On-Time Delivery Rate — By Supplier Tier</div>
-      <div class="sub2">Tier 1 suppliers maintain &gt;96% OTD. Spot suppliers carry highest delivery risk and should be minimized.</div>
-      <canvas id="otdChart" height="240"></canvas>
+      <div class="ttl">Portfolio Mix by Category</div>
+      <div class="sub2">Gaming represented ~30% of managed portfolio during the decline — enough weight to matter but not enough to drag total revenue negative.</div>
+      <canvas id="c1_mix" height="220"></canvas>
+    </div>
+    <div class="card">
+      <div class="ttl">Impact Summary — Three Stories in Numbers</div>
+      <div class="sub2">Three concurrent initiatives, one S&amp;OP room, one shared view of risk.</div>
+      <canvas id="c1_impact" height="220"></canvas>
     </div>
   </div>
+
 </div>
 
-<!-- ── Tab 2: Stochastic Safety Stock ── -->
-<div id="tab-safetystock" class="tab-panel">
-  <div style="background:#f8f9ff;border-left:3px solid #6366f1;border-radius:8px;padding:16px;margin-bottom:20px;">
-    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6366f1;margin-bottom:6px;">Methodology</div>
-    <div style="font-size:13px;color:#0f172a;line-height:1.6;">Statistical safety-stock models using stochastic lead-time distributions derived from supplier data. Applied probabilistic demand variability estimation to replace static SS formulas — improving finished-goods availability 40% while reducing excess inventory.</div>
+<!-- ═══════════════════════════════════════════════
+     TAB 2 · Gaming E&O Management
+═══════════════════════════════════════════════ -->
+<div id="tab-gaming" class="tab-panel">
+
+  <div class="decision-box">
+    <div class="dt">Key Insight</div>
+    <p>Supply cuts stop the bleeding but don't clear aging inventory. When Gaming fell 17% post-COVID, the question was: how much of the excess is recoverable through channel action vs. how much becomes true write-off? Separating those two piles in the weekly S&amp;OP — and forcing GTM commercial to own the recovery actions — cleared the backlog in 6–8 weeks vs. 6–9 months via factory cuts alone.</p>
   </div>
 
   <div class="kpi-row">
-    <div class="kpi gd"><div class="lbl">Overall Fill Rate</div><div class="val">94.2%</div><div class="delta" style="color:var(--good)">Across all product lines</div></div>
-    <div class="kpi bl"><div class="lbl">SS Coverage Days (avg)</div><div class="val">18.4</div><div class="delta" style="color:var(--muted)">Days of safety stock held</div></div>
-    <div class="kpi or"><div class="lbl">Lead Time σ (avg)</div><div class="val">4.2 days</div><div class="delta" style="color:var(--muted)">Across supplier tiers</div></div>
-    <div class="kpi gd"><div class="lbl">Excess SS Reduced</div><div class="val">22%</div><div class="delta" style="color:var(--good)">Vs. static formula baseline</div></div>
+    <div class="kpi rd"><div class="lbl">Gaming Revenue Decline</div><div class="val">−17%</div><div class="sub">YoY post-COVID normalization</div></div>
+    <div class="kpi bl"><div class="lbl">Gaming Portfolio (LGI-wide)</div><div class="val">~$1.21B</div><div class="sub">FY23 Logitech total Gaming</div></div>
+    <div class="kpi or"><div class="lbl">E&amp;O Before Action</div><div class="val">~$2.8M</div><div class="sub">Recoverable + true write-off</div></div>
+    <div class="kpi gd"><div class="lbl">E&amp;O After GTM Actions</div><div class="val">~$1.8M</div><div class="sub">~$1M cleared via GTM</div></div>
+    <div class="kpi gd"><div class="lbl">Recovery Action Types</div><div class="val">3</div><div class="sub">Pull-forward · Bundle · Markdown</div></div>
   </div>
 
   <div class="chart-grid cols2">
     <div class="card full">
-      <div class="ttl">Lead Time Distribution — By Supplier Tier (Simulated from Supplier Data)</div>
-      <div class="sub2">Tier 1 (tight, μ=14d) · Tier 2 (wider, μ=21d) · Tier 3 (wide/skewed, μ=28d). Stochastic SS calibrated to these distributions.</div>
-      <canvas id="ltDistChart" height="80"></canvas>
+      <div class="ttl">Gaming Demand Index — 20-Month Trend</div>
+      <div class="sub2">Strong post-COVID tailwind (WFH gaming surge) peaked around Month 8, then normalized 17% YoY as the pull-forward from lockdown periods unwound. The inflection is where recoverable excess formed.</div>
+      <canvas id="c2_demand" height="100"></canvas>
     </div>
     <div class="card">
-      <div class="ttl">Safety Stock Days vs. Demand Variability — By Product Line</div>
-      <div class="sub2">Higher demand CoV requires proportionally higher SS. Each dot = one SKU. Lines show regression by category.</div>
-      <canvas id="ssScatterChart" height="240"></canvas>
+      <div class="ttl">E&amp;O by Recovery Path — Stacked</div>
+      <div class="sub2">Channel pull-forwards were the fastest clearance mechanism. Promotional bundles cleared slower but required less margin concession. Markdowns were last resort.</div>
+      <canvas id="c2_recovery" height="240"></canvas>
     </div>
     <div class="card">
-      <div class="ttl">Fill Rate Before vs. After Stochastic Model — By Product Line</div>
-      <div class="sub2">All lines saw material fill-rate improvement after static SS formulas were replaced with stochastic models.</div>
-      <canvas id="fillRateChart" height="240"></canvas>
+      <div class="ttl">Supply Cut vs. GTM Action — Time to Clear</div>
+      <div class="sub2">Factory order cancellation stops future inflow but does nothing for inventory already in warehouse. GTM commercial actions move existing stock — a fundamentally faster lever.</div>
+      <canvas id="c2_cleartime" height="240"></canvas>
+    </div>
+    <div class="card full">
+      <div class="ttl">E&amp;O Waterfall — Movement Over the Period</div>
+      <div class="sub2">Opening balance → factory cancellations stopped future exposure → GTM pull-forwards + promotional clearance + markdowns reduced stock → remaining aging balance.</div>
+      <canvas id="c2_waterfall" height="130"></canvas>
     </div>
   </div>
+
 </div>
 
-<!-- ── Tab 3: S&OP Cadence ── -->
+<!-- ═══════════════════════════════════════════════
+     TAB 3 · Supply Disruption & Expedite
+═══════════════════════════════════════════════ -->
+<div id="tab-disruption" class="tab-panel">
+
+  <div class="decision-box">
+    <div class="dt">The Math That Changed the Conversation</div>
+    <p>"Expediting SKU A costs $50K but only protects $20K in margin. Reallocating existing regional inventory for A and expediting SKU B optimizes portfolio margin." This framing — expedite cost vs. margin protected — shifted expedite decisions from blanket to surgical, saving ~$200K in premium air freight while maintaining service levels through severe global transit disruptions.</p>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi gd"><div class="lbl">Premium Freight Saved</div><div class="val">~$200K</div><div class="sub">vs. blanket expedite baseline</div></div>
+    <div class="kpi gd"><div class="lbl">Service Level</div><div class="val">Maintained</div><div class="sub">Through disruption period</div></div>
+    <div class="kpi bl"><div class="lbl">Prioritization Framework</div><div class="val">Margin-Weighted</div><div class="sub">Not blanket expediting</div></div>
+    <div class="kpi or"><div class="lbl">Expedite Decision Criteria</div><div class="val">4 Factors</div><div class="sub">Launch · Commit · Margin · Stage</div></div>
+    <div class="kpi rd"><div class="lbl">Blanket Expedites Avoided</div><div class="val">Yes</div><div class="sub">Math proved to Sales</div></div>
+  </div>
+
+  <div class="chart-grid cols2">
+    <div class="card">
+      <div class="ttl">Expedite Decision Matrix — Cost vs. Margin Protected</div>
+      <div class="sub2">Top-right = expedite (high margin, affordable cost). Bottom-left = reallocate regional inventory instead. Each point = one SKU decision during disruption period.</div>
+      <canvas id="c3_scatter" height="260"></canvas>
+    </div>
+    <div class="card">
+      <div class="ttl">Top 10 Expedite Decisions — Cost vs. Margin Protected</div>
+      <div class="sub2">Only expedited where incremental margin exceeded expedite cost. "Reallocate" decisions used existing regional stock to protect service level at zero premium freight cost.</div>
+      <canvas id="c3_decisions" height="260"></canvas>
+    </div>
+    <div class="card full">
+      <div class="ttl">Monthly Air Freight Spend — Actual vs. Blanket Expedite Counterfactual</div>
+      <div class="sub2">Dotted line shows estimated spend if blanket expediting had been applied. Margin-weighted approach reduced premium freight by ~$200K over the disruption window while achieving the same service level outcome.</div>
+      <canvas id="c3_freight" height="110"></canvas>
+    </div>
+    <div class="card">
+      <div class="ttl">Regional Inventory Reallocation — Before &amp; After Rebalancing</div>
+      <div class="sub2">Before: EMEA overweight, APAC short. After: rebalanced using in-transit rerouting, eliminating the need to expedite 4 SKUs into APAC.</div>
+      <canvas id="c3_realloc" height="240"></canvas>
+    </div>
+    <div class="card">
+      <div class="ttl">Expedite Prioritization Criteria — Weight by Factor</div>
+      <div class="sub2">Launch date proximity weighted highest — missing a launch window is the most irreversible outcome. Customer commitment second. Margin contribution third. Lifecycle stage last.</div>
+      <canvas id="c3_criteria" height="240"></canvas>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     TAB 4 · Global S&OP Cadence
+═══════════════════════════════════════════════ -->
 <div id="tab-sop" class="tab-panel">
-  <div style="background:#f8f9ff;border-left:3px solid #6366f1;border-radius:8px;padding:16px;margin-bottom:20px;">
-    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6366f1;margin-bottom:6px;">Process Context</div>
-    <div style="font-size:13px;color:#0f172a;line-height:1.6;">Weekly S&amp;OP cadence across supply chain, finance, and regional operations teams. SQL-based demand signal pipeline synthesizing POS, sell-in, and backorder data across international DCs to surface demand-supply gaps for cross-regional decisions.</div>
+
+  <div class="decision-box">
+    <div class="dt">Operating Principle</div>
+    <p>Status meetings feel productive but produce no decisions. Every S&amp;OP agenda item was required to have one fact base, one owner, and one due date — or it didn't make the agenda. ODMs submitted capacity constraints on a fixed template; deviations were auto-flagged. The result: meeting time on decisions went from 20% to 85%, action-item completion went from 55% to 89%.</p>
   </div>
 
   <div class="kpi-row">
-    <div class="kpi bl"><div class="lbl">Review Cadence</div><div class="val">Weekly</div><div class="delta" style="color:var(--muted)">Cross-functional S&amp;OP</div></div>
-    <div class="kpi gd"><div class="lbl">Regions Aligned</div><div class="val">4</div><div class="delta" style="color:var(--muted)">NA · EMEA · APAC · LatAm</div></div>
-    <div class="kpi or"><div class="lbl">Plan Revision Cycles</div><div class="val">−38%</div><div class="delta" style="color:var(--good)">Fewer re-plans per cycle</div></div>
-    <div class="kpi gd"><div class="lbl">Demand-Supply Gap</div><div class="val">&lt;3%</div><div class="delta" style="color:var(--good)">Current steady state</div></div>
+    <div class="kpi bl"><div class="lbl">Regions</div><div class="val">3</div><div class="sub">NA · EMEA · APAC</div></div>
+    <div class="kpi bl"><div class="lbl">Meeting Cadence</div><div class="val">Weekly</div><div class="sub">Global time zones aligned</div></div>
+    <div class="kpi gd"><div class="lbl">Agenda Item Rule</div><div class="val">1/1/1</div><div class="sub">Fact base / owner / due date</div></div>
+    <div class="kpi or"><div class="lbl">Status Updates Banned</div><div class="val">Yes</div><div class="sub">Exceptions only</div></div>
+    <div class="kpi gd"><div class="lbl">ODM Compliance (End State)</div><div class="val">94%</div><div class="sub">Fixed template + deadline</div></div>
   </div>
 
   <div class="chart-grid cols2">
+    <div class="card">
+      <div class="ttl">Before vs. After — S&amp;OP Design Scorecard</div>
+      <div class="sub2">Redesigning the meeting format — not adding people or tools — drove the improvement. The single biggest change: banning status updates from the agenda entirely.</div>
+      <canvas id="c4_before_after" height="240"></canvas>
+    </div>
+    <div class="card">
+      <div class="ttl">ODM Template Submission Compliance — 12 Weeks</div>
+      <div class="sub2">Started at 62% (late or missing). Fixed deadline + auto-flag for deviations drove compliance to 94% by Week 10. No new systems — just an enforced process change.</div>
+      <canvas id="c4_odm" height="240"></canvas>
+    </div>
     <div class="card full">
-      <div class="ttl">Weekly Demand-Supply Gap % — 52-Week Trend</div>
-      <div class="sub2">Gap narrows after S&amp;OP pipeline deployed (Week 8). Steady-state gap below 3% achieved by Q3.</div>
-      <canvas id="sopGapChart" height="80"></canvas>
+      <div class="ttl">S&amp;OP Agenda Composition — Evolution Over 3 Months (by week)</div>
+      <div class="sub2">Week 1–4: majority status updates. Week 5–8: transition period as teams learned the new format. Week 9–12: steady state — primarily exceptions and decisions.</div>
+      <canvas id="c4_evolution" height="110"></canvas>
     </div>
-    <div class="card">
-      <div class="ttl">Plan Accuracy — By Region</div>
-      <div class="sub2">North America leads at 94.2%. LatAm shows greatest improvement opportunity due to data latency.</div>
-      <canvas id="planAccChart" height="240"></canvas>
-    </div>
-    <div class="card">
-      <div class="ttl">S&amp;OP Milestone Calendar — Monthly Cycle</div>
-      <div class="sub2">Standard 4-week cadence: data pull → demand review → supply review → pre-S&amp;OP → exec S&amp;OP → deployment</div>
-      <div style="overflow-x:auto;">
-        <table>
-          <thead><tr><th>Week</th><th>Milestone</th><th>Owner</th><th>Status</th></tr></thead>
-          <tbody>
-            <tr><td>1</td><td>POS &amp; Inventory Data Pull</td><td>Supply Analytics</td><td style="color:var(--good);font-weight:600;">✅ Complete</td></tr>
-            <tr><td>1</td><td>Demand Signal Integration</td><td>Demand Planning</td><td style="color:var(--good);font-weight:600;">✅ Complete</td></tr>
-            <tr><td>2</td><td>Demand Review Meeting</td><td>Demand Planning</td><td style="color:var(--warn);font-weight:600;">🔄 In Progress</td></tr>
-            <tr><td>2</td><td>Supply Review Meeting</td><td>Supply Planning</td><td style="color:var(--warn);font-weight:600;">🔄 In Progress</td></tr>
-            <tr><td>3</td><td>Pre-S&amp;OP Cross-functional</td><td>All Teams</td><td style="color:var(--muted);font-weight:600;">⏳ Scheduled</td></tr>
-            <tr><td>4</td><td>Executive S&amp;OP &amp; Deployment</td><td>Leadership</td><td style="color:var(--muted);font-weight:600;">⏳ Upcoming</td></tr>
-          </tbody>
-        </table>
+  </div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div class="ttl">Weekly S&amp;OP Operating Cycle</div>
+    <div class="sub2" style="margin-bottom:10px;">Five fixed touchpoints. No ad-hoc escalation calls — everything routed through the cadence.</div>
+    <div class="timeline">
+      <div class="tl-step">
+        <div class="tl-day">Monday</div>
+        <div class="tl-title">Regional Data Submission</div>
+        <div class="tl-desc">NA / EMEA / APAC teams submit POS, inventory, and sell-in data by 9 AM local time.</div>
+        <span class="tl-arrow">›</span>
+      </div>
+      <div class="tl-step">
+        <div class="tl-day">Tuesday</div>
+        <div class="tl-title">ODM Capacity Template Due</div>
+        <div class="tl-desc">All ODM partners submit capacity constraints on fixed template. Late submissions auto-flagged.</div>
+        <span class="tl-arrow">›</span>
+      </div>
+      <div class="tl-step">
+        <div class="tl-day">Wednesday</div>
+        <div class="tl-title">Exception Flag Run</div>
+        <div class="tl-desc">Automated exception identification: launch fill gaps, E&amp;O thresholds, expedite triggers.</div>
+        <span class="tl-arrow">›</span>
+      </div>
+      <div class="tl-step">
+        <div class="tl-day">Thursday</div>
+        <div class="tl-title">S&amp;OP Review — Exceptions Only</div>
+        <div class="tl-desc">Cross-functional decision meeting. Each item: one fact base, one owner, one due date. No status updates.</div>
+        <span class="tl-arrow">›</span>
+      </div>
+      <div class="tl-step">
+        <div class="tl-day">Friday</div>
+        <div class="tl-title">Action Item Follow-Up</div>
+        <div class="tl-desc">Owner confirms completion or escalates. Unresolved items carry forward with updated due date — no silent drops.</div>
       </div>
     </div>
   </div>
+
 </div>
 
-<!-- ── Tab 4: NPI Launch Tracker ── -->
-<div id="tab-npi" class="tab-panel">
-  <div style="background:#f8f9ff;border-left:3px solid #6366f1;border-radius:8px;padding:16px;margin-bottom:20px;">
-    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6366f1;margin-bottom:6px;">NPI Context</div>
-    <div style="font-size:13px;color:#0f172a;line-height:1.6;">NPI launch planning for custom tablet peripherals with ODM/contract manufacturing partners — managing material readiness, capacity ramp-up, and phase-in/phase-out planning. Accelerated launch delivery by 15%.</div>
+<!-- ═══════════════════════════════════════════════
+     TAB 5 · Integrated View
+═══════════════════════════════════════════════ -->
+<div id="tab-integrated" class="tab-panel">
+
+  <div class="decision-box">
+    <div class="dt">Why the Integration Mattered</div>
+    <p>Launch fill, E&amp;O, and expedite cost had never been in the same room at the same time. When fill rate dropped, expedite spend went up, and E&amp;O went up — but the root cause wasn't visible because the metrics lived in separate reports. Connecting all three in one shared view forced the root cause question in the same meeting where it could be answered.</p>
   </div>
 
   <div class="kpi-row">
-    <div class="kpi bl"><div class="lbl">Active NPIs</div><div class="val">8</div><div class="delta" style="color:var(--muted)">In pipeline</div></div>
-    <div class="kpi gd"><div class="lbl">On Track</div><div class="val">5</div><div class="delta" style="color:var(--good)">Within schedule</div></div>
-    <div class="kpi or"><div class="lbl">At Risk</div><div class="val">2</div><div class="delta" style="color:var(--crit)">Need intervention</div></div>
-    <div class="kpi gd"><div class="lbl">Avg Launch Acceleration</div><div class="val">15%</div><div class="delta" style="color:var(--good)">Vs. prior NPI baseline</div></div>
+    <div class="kpi gd"><div class="lbl">Launch Fill Rate</div><div class="val">Improved</div><div class="sub">Visible in S&amp;OP weekly</div></div>
+    <div class="kpi gd"><div class="lbl">Metrics Connected</div><div class="val">3 in 1</div><div class="sub">Fill · E&amp;O · Expedite</div></div>
+    <div class="kpi bl"><div class="lbl">Cross-Function Decisions</div><div class="val">Weekly</div><div class="sub">Same meeting, same view</div></div>
+    <div class="kpi or"><div class="lbl">Time to Decision</div><div class="val">Same meeting</div><div class="sub">vs. days/weeks prior</div></div>
+    <div class="kpi gd"><div class="lbl">Cost of Delay Visibility</div><div class="val">Made Explicit</div><div class="sub">Quantified per scenario</div></div>
   </div>
 
   <div class="chart-grid cols2">
     <div class="card full">
-      <div class="ttl">NPI Timeline — Phase Gantt (Months from Program Start)</div>
-      <div class="sub2">Design Lock → Prototype → DVT → PVT → MP Ramp. Product C and E are at risk due to ODM capacity constraints.</div>
-      <canvas id="ganttChart" height="100"></canvas>
+      <div class="ttl">Launch Fill Rate · E&amp;O Level · Air Freight Spend — 12 Months (Indexed)</div>
+      <div class="sub2">Connecting these three in one view made the causal chain visible: when fill rate dropped (supply disruption), air freight spiked (blanket expedite response), and E&amp;O grew (over-ordering to compensate). The S&amp;OP forced the upstream root cause question before the pattern repeated.</div>
+      <canvas id="c5_triple" height="120"></canvas>
     </div>
     <div class="card">
-      <div class="ttl">Material Readiness — By NPI Program</div>
-      <div class="sub2">Product E (61%) and Product C (72%) are below 80% readiness threshold and require expedite action.</div>
-      <canvas id="matReadinessChart" height="240"></canvas>
+      <div class="ttl">Cost of Delay — Gaming E&amp;O: Act Now vs. 4 Weeks vs. 8 Weeks Late</div>
+      <div class="sub2">Aging inventory accrues markdown cost non-linearly. Delaying GTM action by 8 weeks more than doubles the total clearance cost due to deeper discounting required and lost pull-forward windows.</div>
+      <canvas id="c5_delay" height="240"></canvas>
     </div>
     <div class="card">
-      <div class="ttl">NPI Status Summary</div>
-      <div class="sub2">Status as of current review cycle. At-Risk items flagged for cross-functional escalation.</div>
-      <div style="overflow-x:auto;">
-        <table>
-          <thead><tr><th>Product</th><th>ODM Partner</th><th>Launch Target</th><th>Status</th><th>Risk</th><th>Lead Time</th></tr></thead>
-          <tbody>
-            <tr><td>Product A</td><td>Foxconn</td><td>Q2 2021</td><td style="color:var(--good);font-weight:600;">On Track</td><td style="color:var(--good);">Low</td><td>14 wks</td></tr>
-            <tr><td>Product B</td><td>Pegatron</td><td>Q3 2021</td><td style="color:var(--good);font-weight:600;">On Track</td><td style="color:var(--good);">Low</td><td>16 wks</td></tr>
-            <tr><td>Product C</td><td>Compal</td><td>Q2 2021</td><td style="color:var(--crit);font-weight:600;">At Risk</td><td style="color:var(--crit);">High</td><td>12 wks</td></tr>
-            <tr><td>Product D</td><td>Foxconn</td><td>Q4 2021</td><td style="color:var(--good);font-weight:600;">On Track</td><td style="color:var(--good);">Low</td><td>18 wks</td></tr>
-            <tr><td>Product E</td><td>Wistron</td><td>Q1 2022</td><td style="color:var(--warn);font-weight:600;">At Risk</td><td style="color:var(--warn);">Medium</td><td>20 wks</td></tr>
-            <tr><td>Product F</td><td>Pegatron</td><td>Q3 2021</td><td style="color:var(--good);font-weight:600;">On Track</td><td style="color:var(--good);">Low</td><td>15 wks</td></tr>
-          </tbody>
-        </table>
-      </div>
+      <div class="ttl">Cross-Functional Action Completion Rate — Before &amp; After S&amp;OP Redesign</div>
+      <div class="sub2">Planning and Finance improved most. Sales/GTM improved most visibly — the redesign made non-completion public in the Thursday review, which created accountability that emails alone didn't.</div>
+      <canvas id="c5_completion" height="240"></canvas>
     </div>
-  </div>
-</div>
-
-<!-- ── Tab 5: Expedite Risk ── -->
-<div id="tab-expedite" class="tab-panel">
-  <div style="background:#f8f9ff;border-left:3px solid #6366f1;border-radius:8px;padding:16px;margin-bottom:20px;">
-    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6366f1;margin-bottom:6px;">Freight Optimization Context</div>
-    <div style="font-size:13px;color:#0f172a;line-height:1.6;">Air freight vs. ocean freight cost analysis. Data-driven dual-sourcing and stochastic safety stock models reduced reliance on air expedites, saving ~$200K in freight costs annually while maintaining service levels.</div>
   </div>
 
-  <div class="kpi-row">
-    <div class="kpi or"><div class="lbl">Air Freight (Current)</div><div class="val">$180K</div><div class="delta" style="color:var(--muted)">Annual run rate</div></div>
-    <div class="kpi bl"><div class="lbl">Previous Year</div><div class="val">$380K</div><div class="delta" style="color:var(--muted)">Before SS optimization</div></div>
-    <div class="kpi gd"><div class="lbl">Savings</div><div class="val">~$200K</div><div class="delta" style="color:var(--good)">Year-over-year reduction</div></div>
-    <div class="kpi or"><div class="lbl">Items at Expedite Risk</div><div class="val">14</div><div class="delta" style="color:var(--warn)">Require mode review</div></div>
+  <div class="callout-row">
+    <div class="callout-card">
+      <div class="num">01</div>
+      <div class="ttl2">Launch Fill → Inventory at Risk</div>
+      <p>A fill rate miss on a new product launch doesn't just lose the launch window — it triggers emergency replenishment that arrives after the demand peak, converting fill inventory into E&amp;O. Visible in the same view, the connection drove pre-launch safety stock decisions instead of post-launch expedites.</p>
+    </div>
+    <div class="callout-card">
+      <div class="num">02</div>
+      <div class="ttl2">E&amp;O → Margin Erosion Timeline</div>
+      <p>E&amp;O isn't a static write-off risk — it erodes margin progressively: first as carrying cost, then as promotional concession, then as markdown. Showing the timeline in the S&amp;OP forced earlier GTM action when commercial levers (pull-forwards, bundles) were still at favorable margin.</p>
+    </div>
+    <div class="callout-card">
+      <div class="num">03</div>
+      <div class="ttl2">Expedite Cost → When Reallocation is Cheaper</div>
+      <p>Expedite decisions were previously made in isolation by Sales ("we need it"). Showing expedite cost vs. margin protected vs. regional reallocation cost in one view let the S&amp;OP choose the cheapest path to the same service outcome — saving ~$200K without a single service level miss.</p>
+    </div>
   </div>
 
-  <div class="chart-grid cols2">
-    <div class="card full">
-      <div class="ttl">Monthly Freight Spend — Air vs. Ocean ($K)</div>
-      <div class="sub2">Safety stock optimization (Month 4) drove rapid reduction in air expedites. Ocean share increased as lead time buffers improved.</div>
-      <canvas id="freightTrendChart" height="80"></canvas>
-    </div>
-    <div class="card">
-      <div class="ttl">Transport Mode Mix — By Region (%)</div>
-      <div class="sub2">APAC and LatAm still carry higher air-freight exposure; dual-sourcing initiatives underway to shift to ocean.</div>
-      <canvas id="transportModeChart" height="240"></canvas>
-    </div>
-    <div class="card">
-      <div class="ttl">Items at Expedite Risk</div>
-      <div class="sub2">14 SKUs identified as high expedite risk. Recommended actions: dual-source, increase SS, or pre-position to regional DC.</div>
-      <div style="overflow-x:auto;">
-        <table>
-          <thead><tr><th>SKU</th><th>Product Line</th><th>DC</th><th>LT Remaining</th><th>Risk</th><th>Action</th></tr></thead>
-          <tbody>
-            <tr><td style="font-family:monospace;font-size:11px">LGT-29871</td><td>Webcams</td><td>EMEA-AMS</td><td style="color:var(--crit);font-weight:600;">3 days</td><td style="color:var(--crit);font-weight:600;">🔴 Critical</td><td style="font-size:11px">Emergency air — pre-approve</td></tr>
-            <tr><td style="font-family:monospace;font-size:11px">LGT-44302</td><td>Headsets</td><td>EMEA-LON</td><td style="color:var(--crit);font-weight:600;">5 days</td><td style="color:var(--crit);font-weight:600;">🔴 Critical</td><td style="font-size:11px">Dual-source activation</td></tr>
-            <tr><td style="font-family:monospace;font-size:11px">LGT-12891</td><td>Gaming</td><td>NA-DFW</td><td style="color:var(--warn);font-weight:600;">8 days</td><td style="color:var(--warn);font-weight:600;">🟡 Warning</td><td style="font-size:11px">Increase SS by 5 days</td></tr>
-            <tr><td style="font-family:monospace;font-size:11px">LGT-51204</td><td>Webcams</td><td>APAC-SGP</td><td style="color:var(--warn);font-weight:600;">10 days</td><td style="color:var(--warn);font-weight:600;">🟡 Warning</td><td style="font-size:11px">Monitor daily</td></tr>
-            <tr><td style="font-family:monospace;font-size:11px">LGT-18293</td><td>Tablet Acc</td><td>LatAm-GRU</td><td style="color:var(--warn);font-weight:600;">12 days</td><td style="color:var(--warn);font-weight:600;">🟡 Warning</td><td style="font-size:11px">Pre-position to hub DC</td></tr>
-            <tr><td style="font-family:monospace;font-size:11px">LGT-67831</td><td>Mice</td><td>NA-SEA</td><td style="color:var(--good);font-weight:600;">18 days</td><td style="color:var(--good);font-weight:600;">🟢 Monitor</td><td style="font-size:11px">Ocean feasible — shift mode</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
 </div>
 
 </main>
 
 <footer>
-  <span>⚠ Demo data</span>
-  <a href="https://asthaj12.github.io" target="_blank">📄 Portfolio →</a>
-  <span style="margin-left:auto">Astha Jain · <a href="https://linkedin.com/in/asthajain12" target="_blank">LinkedIn</a></span>
+  <span>Demo data — illustrative only</span>
+  <a href="https://asthaj12.github.io/" target="_blank" rel="noopener">Portfolio</a>
+  <span style="margin-left:auto">Built by Astha Jain · <a href="https://linkedin.com/in/asthajain12" target="_blank" rel="noopener">LinkedIn</a> · <a href="https://github.com/asthaj12" target="_blank" rel="noopener">GitHub</a> · <a href="mailto:asthajain.sc@gmail.com">Email</a></span>
 </footer>
 
 <script>
-const C={blue:'#6366f1',orange:'#eb6834',aqua:'#1baf7a',yellow:'#eda100',magenta:'#e87ba4',good:'#0ca30c',warn:'#fab219',crit:'#d03b3b',grid:'#e1e0d9',muted:'#898781',text:'#52514e'};
-const base={responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false},tooltip:{backgroundColor:'#fff',borderColor:C.grid,borderWidth:1,titleColor:'#0b0b0b',bodyColor:C.text,padding:10,boxPadding:4}},scales:{x:{grid:{color:C.grid,lineWidth:.5},ticks:{color:C.muted,font:{size:11}}},y:{grid:{color:C.grid,lineWidth:.5},ticks:{color:C.muted,font:{size:11}},border:{dash:[3,3]}}}};
+/* ────────────────────────────────────────────
+   Shared config
+──────────────────────────────────────────── */
+const C={
+  blue:'#6366f1',orange:'#eb6834',aqua:'#1baf7a',yellow:'#eda100',
+  pink:'#e87ba4',violet:'#4a3aa7',
+  good:'#0ca30c',warn:'#fab219',crit:'#d03b3b',
+  grid:'#e1e0d9',muted:'#898781',text:'#52514e'
+};
 
-// ── Tab 1: Availability Rate Trend ──
-const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const availData=[62,63,64,67,72,76,80,83,85,86,87,88];
-new Chart(document.getElementById('availChart'),{type:'line',data:{labels:months,datasets:[
-  {label:'Availability Rate %',data:availData,borderColor:C.blue,backgroundColor:C.blue+'22',fill:true,borderWidth:2,pointRadius:4,tension:.35}
-]},options:{...base,plugins:{...base.plugins,annotation:{annotations:{ssLine:{type:'line',xMin:3,xMax:3,borderColor:C.crit,borderWidth:1.5,borderDash:[4,3],label:{display:true,content:'Stochastic SS model deployed',font:{size:10,weight:'bold'},color:C.crit,position:'start',backgroundColor:'rgba(255,255,255,.9)',padding:4}}}}},scales:{x:base.scales.x,y:{...base.scales.y,min:50,max:100,title:{display:true,text:'Availability Rate %',font:{size:11},color:C.muted}}}}});
+const baseScales={
+  x:{grid:{color:C.grid,lineWidth:.5},ticks:{color:C.muted,font:{size:11}}},
+  y:{grid:{color:C.grid,lineWidth:.5},ticks:{color:C.muted,font:{size:11}},border:{dash:[3,3]}}
+};
+const baseTip={backgroundColor:'#fff',borderColor:C.grid,borderWidth:1,titleColor:'#0b0b0b',bodyColor:C.text,padding:10,boxPadding:4};
+const baseLegend={display:true,labels:{font:{size:11},color:C.text,boxWidth:10,padding:10}};
 
-// ── Tab 1: Supply vs Demand by Product Line ──
-const pLines=['Gaming','Webcams','Headsets','Keyboards','Mice','Tablet Acc'];
-new Chart(document.getElementById('supplyDemandChart'),{type:'bar',data:{labels:pLines,datasets:[
-  {label:'Supply',data:[4200,3800,2900,5100,6200,1400],backgroundColor:C.blue+'cc',borderRadius:3,borderSkipped:false},
-  {label:'Demand',data:[4100,4100,3200,4800,5900,1200],backgroundColor:C.orange+'cc',borderRadius:3,borderSkipped:false}
-]},options:{...base,plugins:{...base.plugins,legend:{display:true,labels:{font:{size:11},color:C.text,boxWidth:8,padding:8}}},scales:{x:base.scales.x,y:{...base.scales.y,title:{display:true,text:'Units (000s)',font:{size:11},color:C.muted}}}}});
+function makeOpts(overrides={}){
+  return Object.assign({responsive:true,maintainAspectRatio:true,plugins:{legend:{display:false},tooltip:baseTip},scales:baseScales},overrides);
+}
 
-// ── Tab 1: OTD by Supplier Tier ──
-new Chart(document.getElementById('otdChart'),{type:'bar',data:{labels:['Tier 1','Tier 2','Tier 3','Spot'],datasets:[
-  {data:[96.2,89.4,81.2,72.8],backgroundColor:[C.good+'cc',C.aqua+'cc',C.warn+'cc',C.crit+'cc'],borderRadius:4,borderSkipped:false}
-]},options:{...base,indexAxis:'y',scales:{x:{...base.scales.x,min:60,max:100,title:{display:true,text:'On-Time Delivery Rate %',font:{size:11},color:C.muted}},y:base.scales.y}}});
+/* ────────────────────────────────────────────
+   TAB 1 — Portfolio Overview
+──────────────────────────────────────────── */
 
-// ── Tab 2: Lead Time Distribution ──
-function normalPDF(x,mu,sigma){return(1/(sigma*Math.sqrt(2*Math.PI)))*Math.exp(-0.5*Math.pow((x-mu)/sigma,2));}
-const ltDays=Array.from({length:56},(_,i)=>i+5);
-new Chart(document.getElementById('ltDistChart'),{type:'line',data:{labels:ltDays,datasets:[
-  {label:'Tier 1 (μ=14d, tight)',data:ltDays.map(x=>normalPDF(x,14,2)),borderColor:C.good,backgroundColor:C.good+'18',fill:true,borderWidth:2,pointRadius:0,tension:.4},
-  {label:'Tier 2 (μ=21d, wider)',data:ltDays.map(x=>normalPDF(x,21,5)),borderColor:C.blue,backgroundColor:C.blue+'18',fill:true,borderWidth:2,pointRadius:0,tension:.4},
-  {label:'Tier 3 (μ=28d, skewed)',data:ltDays.map(x=>normalPDF(x,28,8)),borderColor:C.orange,backgroundColor:C.orange+'18',fill:true,borderWidth:2,pointRadius:0,tension:.4},
-]},options:{...base,plugins:{...base.plugins,legend:{display:true,labels:{font:{size:11},color:C.text,boxWidth:8,padding:8}}},scales:{x:{...base.scales.x,title:{display:true,text:'Lead Time (Days)',font:{size:11},color:C.muted},ticks:{maxTicksLimit:12,color:C.muted,font:{size:11}}},y:{...base.scales.y,title:{display:true,text:'Frequency (Probability Density)',font:{size:11},color:C.muted}}}}});
-
-// ── Tab 2: SS vs Demand CoV Scatter ──
-new Chart(document.getElementById('ssScatterChart'),{type:'scatter',data:{datasets:[
-  {label:'Gaming',data:[{x:.18,y:12},{x:.22,y:14},{x:.25,y:16},{x:.20,y:13},{x:.23,y:15}],backgroundColor:C.blue+'cc',pointRadius:7},
-  {label:'Webcams',data:[{x:.35,y:20},{x:.40,y:24},{x:.38,y:22},{x:.42,y:25},{x:.36,y:21}],backgroundColor:C.orange+'cc',pointRadius:7},
-  {label:'Headsets',data:[{x:.28,y:17},{x:.32,y:19},{x:.30,y:18},{x:.33,y:20},{x:.29,y:17}],backgroundColor:C.aqua+'cc',pointRadius:7},
-  {label:'Keyboards',data:[{x:.12,y:9},{x:.15,y:10},{x:.14,y:10},{x:.16,y:11},{x:.13,y:9}],backgroundColor:C.yellow+'cc',pointRadius:7},
-  {label:'Mice',data:[{x:.10,y:8},{x:.12,y:9},{x:.11,y:8},{x:.13,y:9},{x:.10,y:7}],backgroundColor:C.magenta+'cc',pointRadius:7},
-  {label:'Tablet Acc',data:[{x:.44,y:28},{x:.48,y:31},{x:.46,y:29},{x:.50,y:33},{x:.45,y:29}],backgroundColor:'#64748b'+'cc',pointRadius:7},
-]},options:{...base,plugins:{...base.plugins,legend:{display:true,labels:{font:{size:11},color:C.text,boxWidth:8,padding:6}}},scales:{x:{...base.scales.x,min:0,max:.6,title:{display:true,text:'Demand Coefficient of Variation (CoV)',font:{size:11},color:C.muted}},y:{...base.scales.y,min:0,max:40,title:{display:true,text:'Safety Stock Days',font:{size:11},color:C.muted}}}}});
-
-// ── Tab 2: Fill Rate Before/After ──
-new Chart(document.getElementById('fillRateChart'),{type:'bar',data:{labels:['Gaming','Webcams','Headsets','Keyboards','Mice','Tablet Acc'],datasets:[
-  {label:'Before (Static SS)',data:[71,58,62,79,83,74],backgroundColor:C.crit+'88',borderRadius:3,borderSkipped:false},
-  {label:'After (Stochastic)',data:[92,88,91,96,97,93],backgroundColor:C.good+'aa',borderRadius:3,borderSkipped:false}
-]},options:{...base,indexAxis:'y',plugins:{...base.plugins,legend:{display:true,labels:{font:{size:11},color:C.text,boxWidth:8,padding:8}}},scales:{x:{...base.scales.x,min:40,max:100,title:{display:true,text:'Fill Rate %',font:{size:11},color:C.muted}},y:base.scales.y}}});
-
-// ── Tab 3: S&OP Demand-Supply Gap ──
-const sopWks=Array.from({length:52},(_,i)=>`Wk ${i+1}`);
-const sopData=Array.from({length:52},(_,i)=>{
-  if(i<8)return 7.2+Math.sin(i*1.4)*.6;
-  const t=(i-8)/43;
-  return Math.max(2.2,6.8-t*4.6+Math.sin(i*.9)*.55);
+// Grouped bar — revenue by region vs prior year
+new Chart(document.getElementById('c1_revenue'),{
+  type:'bar',
+  data:{
+    labels:['NA','EMEA','APAC'],
+    datasets:[
+      {label:'Prior Year',data:[100,100,100],backgroundColor:C.muted+'66',borderRadius:4,borderSkipped:false},
+      {label:'Current Year (all categories)',data:[108,106,107],backgroundColor:C.blue+'cc',borderRadius:4,borderSkipped:false},
+      {label:'Gaming only — current year',data:[83,83,84],backgroundColor:C.crit+'bb',borderRadius:4,borderSkipped:false}
+    ]
+  },
+  options:makeOpts({plugins:{legend:baseLegend,tooltip:baseTip},scales:{
+    x:baseScales.x,
+    y:{...baseScales.y,min:60,max:130,title:{display:true,text:'Revenue Index (Prior Year = 100)',font:{size:11},color:C.muted}}
+  }})
 });
-new Chart(document.getElementById('sopGapChart'),{type:'line',data:{labels:sopWks,datasets:[
-  {label:'Demand-Supply Gap %',data:sopData,borderColor:C.blue,backgroundColor:C.blue+'22',fill:true,borderWidth:2,pointRadius:0,tension:.3}
-]},options:{...base,plugins:{...base.plugins,annotation:{annotations:{sopLine:{type:'line',xMin:7,xMax:7,borderColor:C.good,borderWidth:1.5,borderDash:[4,3],label:{display:true,content:'S&OP pipeline deployed',font:{size:10,weight:'bold'},color:C.good,position:'start',backgroundColor:'rgba(255,255,255,.9)',padding:4}}}}},scales:{x:{...base.scales.x,ticks:{maxTicksLimit:13,color:C.muted,font:{size:11}}},y:{...base.scales.y,min:0,max:12,title:{display:true,text:'Demand-Supply Gap %',font:{size:11},color:C.muted}}}}});
 
-// ── Tab 3: Plan Accuracy by Region ──
-new Chart(document.getElementById('planAccChart'),{type:'bar',data:{labels:['North America','EMEA','APAC','LatAm'],datasets:[
-  {data:[94.2,91.8,88.4,86.1],backgroundColor:[C.good+'cc',C.warn+'cc',C.warn+'cc',C.crit+'cc'],borderRadius:4,borderSkipped:false}
-]},options:{...base,indexAxis:'y',scales:{x:{...base.scales.x,min:80,max:100,title:{display:true,text:'Plan Accuracy %',font:{size:11},color:C.muted}},y:base.scales.y}}});
+// Line — E&O trajectory 12 months
+new Chart(document.getElementById('c1_eao'),{
+  type:'line',
+  data:{
+    labels:['M1','M2','M3','M4','M5','M6','M7','M8','M9','M10','M11','M12'],
+    datasets:[{
+      label:'E&O Balance ($M)',
+      data:[1.9,2.1,2.4,2.8,2.7,2.5,2.2,1.9,1.7,1.4,1.2,0.9],
+      borderColor:C.orange,backgroundColor:C.orange+'22',fill:true,
+      borderWidth:2,pointRadius:4,tension:.35
+    }]
+  },
+  options:makeOpts({plugins:{tooltip:baseTip,legend:{display:false},annotation:{annotations:{
+    peak:{type:'point',xValue:3,yValue:2.8,backgroundColor:C.crit,radius:6,label:{display:true,content:'Peak $2.8M',color:C.crit,font:{size:10,weight:'bold'},position:'top',backgroundColor:'rgba(255,255,255,.9)',padding:4}},
+    end:{type:'point',xValue:11,yValue:0.9,backgroundColor:C.good,radius:6,label:{display:true,content:'$0.9M',color:C.good,font:{size:10,weight:'bold'},position:'bottom',backgroundColor:'rgba(255,255,255,.9)',padding:4}}
+  }}},scales:{x:baseScales.x,y:{...baseScales.y,min:0,max:3.5,title:{display:true,text:'E&O Balance ($M)',font:{size:11},color:C.muted}}}})
+});
 
-// ── Tab 4: NPI Gantt (stacked horizontal bar) ──
-const npiProducts=['Product A','Product B','Product C','Product D','Product E','Product F'];
-const ganttOffsets=[0,1,0,2,3,1];
-const ganttDL=[1,1,2,1,1.5,1];
-const ganttProto=[1,1.5,2,1,2,1];
-const ganttDVT=[2,2,3,2,2.5,2];
-const ganttPVT=[1.5,1.5,2,1.5,1.5,1];
-const ganttMP=[1.5,2,2,1.5,1.5,2];
-new Chart(document.getElementById('ganttChart'),{type:'bar',data:{labels:npiProducts,datasets:[
-  {label:'',data:ganttOffsets,backgroundColor:'transparent',borderColor:'transparent',borderSkipped:false},
-  {label:'Design Lock',data:ganttDL,backgroundColor:'#94a3b8cc',borderRadius:2,borderSkipped:false},
-  {label:'Prototype',data:ganttProto,backgroundColor:C.blue+'cc',borderRadius:2,borderSkipped:false},
-  {label:'DVT',data:ganttDVT,backgroundColor:C.yellow+'cc',borderRadius:2,borderSkipped:false},
-  {label:'PVT',data:ganttPVT,backgroundColor:C.aqua+'cc',borderRadius:2,borderSkipped:false},
-  {label:'MP Ramp',data:ganttMP,backgroundColor:C.orange+'cc',borderRadius:2,borderSkipped:false},
-]},options:{...base,indexAxis:'y',plugins:{...base.plugins,legend:{display:true,labels:{filter:item=>item.datasetIndex>0,font:{size:11},color:C.text,boxWidth:8,padding:8}}},scales:{x:{...base.scales.x,stacked:true,min:0,max:13,title:{display:true,text:'Months from Program Start',font:{size:11},color:C.muted}},y:{...base.scales.y,stacked:true}}}});
+// Donut — portfolio mix
+new Chart(document.getElementById('c1_mix'),{
+  type:'doughnut',
+  data:{
+    labels:['Gaming (30%)','Productivity (35%)','Video / Webcams (20%)','Other (15%)'],
+    datasets:[{
+      data:[30,35,20,15],
+      backgroundColor:[C.crit+'cc',C.blue+'cc',C.aqua+'cc',C.yellow+'cc'],
+      borderWidth:2,borderColor:'#fff'
+    }]
+  },
+  options:{responsive:true,maintainAspectRatio:true,cutout:'60%',plugins:{
+    legend:{display:true,position:'right',labels:{font:{size:11},color:C.text,boxWidth:10,padding:8}},
+    tooltip:baseTip
+  }}
+});
 
-// ── Tab 4: Material Readiness ──
-const matPct=[96,88,72,94,61,83];
-new Chart(document.getElementById('matReadinessChart'),{type:'bar',data:{labels:['Product A','Product B','Product C','Product D','Product E','Product F'],datasets:[
-  {data:matPct,backgroundColor:matPct.map(v=>v>=90?C.good+'cc':v>=80?C.warn+'cc':C.crit+'cc'),borderRadius:4,borderSkipped:false}
-]},options:{...base,indexAxis:'y',plugins:{...base.plugins,annotation:{annotations:{thresh90:{type:'line',scaleID:'x',value:90,borderColor:C.good,borderWidth:1.5,borderDash:[4,3],label:{display:true,content:'Target 90%',font:{size:10},color:C.good,position:'end'}},thresh80:{type:'line',scaleID:'x',value:80,borderColor:C.warn,borderWidth:1.5,borderDash:[4,3],label:{display:true,content:'Min 80%',font:{size:10},color:C.warn,position:'end'}}}}},scales:{x:{...base.scales.x,min:40,max:100,title:{display:true,text:'Material Readiness %',font:{size:11},color:C.muted}},y:base.scales.y}}});
+// Horizontal bar — impact summary
+new Chart(document.getElementById('c1_impact'),{
+  type:'bar',
+  data:{
+    labels:['Revenue Growth (7%)\nvs prior year','E&O Reduction\n($1M annualized)','Air Freight Saved\n($200K)','Gaming Decline\nAbsorbed (17%)'],
+    datasets:[{
+      label:'Achieved',
+      data:[7,1000,200,17],
+      backgroundColor:[C.good+'cc',C.good+'cc',C.good+'cc',C.warn+'cc'],
+      borderRadius:4,borderSkipped:false
+    }]
+  },
+  options:makeOpts({indexAxis:'y',plugins:{tooltip:baseTip,legend:{display:false}},scales:{
+    x:{...baseScales.x,display:false},y:{...baseScales.y,ticks:{color:C.muted,font:{size:10}}}
+  }})
+});
 
-// ── Tab 5: Monthly Freight Spend ──
-const freightMonths=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const airSpend=[42,40,38,35,25,18,15,14,13,12,12,14];
-const oceanSpend=[65,68,70,72,82,90,96,100,102,105,106,103];
-new Chart(document.getElementById('freightTrendChart'),{type:'bar',data:{labels:freightMonths,datasets:[
-  {label:'Air Freight ($K)',data:airSpend,backgroundColor:C.crit+'bb',borderRadius:3,borderSkipped:false},
-  {label:'Ocean Freight ($K)',data:oceanSpend,backgroundColor:C.blue+'88',borderRadius:3,borderSkipped:false},
-]},options:{...base,plugins:{...base.plugins,legend:{display:true,labels:{font:{size:11},color:C.text,boxWidth:8,padding:8}},annotation:{annotations:{optLine:{type:'line',xMin:3,xMax:3,borderColor:C.muted,borderWidth:1.5,borderDash:[4,3],label:{display:true,content:'SS optimization',font:{size:10,weight:'bold'},color:C.muted,position:'start',backgroundColor:'rgba(255,255,255,.9)',padding:4}}}}},scales:{x:base.scales.x,y:{...base.scales.y,title:{display:true,text:'Monthly Spend ($K)',font:{size:11},color:C.muted}}}}});
+/* ────────────────────────────────────────────
+   TAB 2 — Gaming E&O Management
+──────────────────────────────────────────── */
 
-// ── Tab 5: Transport Mode by Region ──
-new Chart(document.getElementById('transportModeChart'),{type:'bar',data:{labels:['North America','EMEA','APAC','LatAm'],datasets:[
-  {label:'Air %',data:[15,25,35,45],backgroundColor:C.crit+'cc',borderRadius:3,borderSkipped:false},
-  {label:'Ocean %',data:[85,75,65,55],backgroundColor:C.blue+'cc',borderRadius:3,borderSkipped:false}
-]},options:{...base,plugins:{...base.plugins,legend:{display:true,labels:{font:{size:11},color:C.text,boxWidth:8,padding:8}}},scales:{x:{...base.scales.x,stacked:true},y:{...base.scales.y,stacked:true,max:100,title:{display:true,text:'Transport Mode Share %',font:{size:11},color:C.muted}}}}});
+// Line — Gaming demand index 20 months
+(function(){
+  const labels=Array.from({length:20},(_,i)=>`M${i+1}`);
+  // Rises to peak around month 8, then declines 17% by month 20
+  const base=[88,92,96,100,104,108,112,116,118,116,112,108,104,100,97,96,96,97,98,99];
+  // Apply 17% decline from peak baseline
+  const gaming=base.map((v,i)=>{
+    if(i<=7)return v;
+    const decline=0.17*((i-7)/12);
+    return Math.round(v*(1-decline)*10)/10;
+  });
+  new Chart(document.getElementById('c2_demand'),{
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        {label:'Gaming Demand Index (PY = 100)',data:gaming,borderColor:C.crit,backgroundColor:C.crit+'18',fill:true,borderWidth:2.5,pointRadius:3,tension:.35},
+        {label:'Total Portfolio Index',data:base.map(v=>v*1.04),borderColor:C.blue,backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,tension:.35,borderDash:[5,4]}
+      ]
+    },
+    options:makeOpts({plugins:{legend:baseLegend,tooltip:baseTip},scales:{
+      x:baseScales.x,
+      y:{...baseScales.y,min:70,max:130,title:{display:true,text:'Demand Index (Month 1 = 88)',font:{size:11},color:C.muted}}
+    }})
+  });
+})();
 
-// ── Tab switching ──
+// Stacked bar — E&O by recovery path
+new Chart(document.getElementById('c2_recovery'),{
+  type:'bar',
+  data:{
+    labels:['Q1','Q2','Q3','Q4 (post-action)'],
+    datasets:[
+      {label:'Channel Pull-Forwards',data:[0,420,680,380],backgroundColor:C.aqua+'cc',borderSkipped:false},
+      {label:'Promotional Bundles',data:[0,180,480,280],backgroundColor:C.blue+'cc',borderSkipped:false},
+      {label:'EOL Markdowns',data:[0,80,260,240],backgroundColor:C.yellow+'cc',borderSkipped:false},
+      {label:'Still Aging',data:[2800,2120,1380,820],backgroundColor:C.crit+'66',borderSkipped:false}
+    ]
+  },
+  options:makeOpts({plugins:{legend:baseLegend,tooltip:baseTip},scales:{
+    x:{...baseScales.x,stacked:true},
+    y:{...baseScales.y,stacked:true,title:{display:true,text:'E&O Balance ($K)',font:{size:11},color:C.muted}}
+  }})
+});
+
+// Bar — supply cut vs GTM action timeline comparison
+new Chart(document.getElementById('c2_cleartime'),{
+  type:'bar',
+  data:{
+    labels:['Order\nCancelled','Factory\nStops Output','Warehouse\nClears','Total Time\nto Clear'],
+    datasets:[
+      {label:'Supply Cut Path (weeks)',data:[2,6,20,28],backgroundColor:C.crit+'99',borderRadius:4,borderSkipped:false},
+      {label:'GTM Action Path (weeks)',data:[1,0,6,7],backgroundColor:C.good+'aa',borderRadius:4,borderSkipped:false}
+    ]
+  },
+  options:makeOpts({plugins:{legend:baseLegend,tooltip:baseTip},scales:{
+    x:baseScales.x,
+    y:{...baseScales.y,title:{display:true,text:'Weeks',font:{size:11},color:C.muted}}
+  }})
+});
+
+// Waterfall — E&O movement
+(function(){
+  const labels=['Opening\nBalance','Factory Orders\nCancelled','GTM\nPull-Forwards','Promotional\nClearance','Markdown','Remaining\nBalance'];
+  // Waterfall: cumulative bars with transparent offset
+  const offsets=[0,0,1400,920,480,0];
+  const values=[2800,-1400,-480,-440,-240,240];
+  const colors=[C.orange+'cc',C.good+'cc',C.aqua+'cc',C.blue+'cc',C.yellow+'cc',C.crit+'cc'];
+  new Chart(document.getElementById('c2_waterfall'),{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[
+        {label:'',data:offsets,backgroundColor:'transparent',borderColor:'transparent',borderSkipped:false},
+        {label:'Movement ($K)',data:values,backgroundColor:colors,borderRadius:3,borderSkipped:false}
+      ]
+    },
+    options:makeOpts({plugins:{legend:{display:false},tooltip:{...baseTip,callbacks:{label:(ctx)=>{if(ctx.datasetIndex===0)return null;const v=ctx.raw;return`${v>0?'+':''}$${v}K`;}}}},scales:{
+      x:baseScales.x,
+      y:{...baseScales.y,stacked:true,title:{display:true,text:'E&O ($K)',font:{size:11},color:C.muted}}
+    }})
+  });
+})();
+
+/* ────────────────────────────────────────────
+   TAB 3 — Supply Disruption & Expedite
+──────────────────────────────────────────── */
+
+// Scatter — expedite cost vs margin protected
+(function(){
+  const expedite=[
+    {x:15,y:42,label:'SKU-F'},{x:22,y:68,label:'SKU-B'},{x:18,y:55,label:'SKU-G'},
+    {x:30,y:85,label:'SKU-A'},{x:25,y:70,label:'SKU-J'}
+  ];
+  const reallocate=[
+    {x:50,y:20,label:'SKU-C'},{x:45,y:18,label:'SKU-D'},{x:60,y:15,label:'SKU-H'},
+    {x:55,y:25,label:'SKU-E'},{x:48,y:22,label:'SKU-K'}
+  ];
+  const hold=[
+    {x:8,y:10,label:'SKU-I'},{x:12,y:8,label:'SKU-L'},{x:6,y:12,label:'SKU-M'}
+  ];
+  new Chart(document.getElementById('c3_scatter'),{
+    type:'scatter',
+    data:{
+      datasets:[
+        {label:'Expedite (margin > cost)',data:expedite,backgroundColor:C.good+'cc',pointRadius:9,pointStyle:'circle'},
+        {label:'Reallocate regional inv.',data:reallocate,backgroundColor:C.orange+'cc',pointRadius:9,pointStyle:'triangle'},
+        {label:'Hold — monitor',data:hold,backgroundColor:C.muted+'99',pointRadius:7,pointStyle:'rect'}
+      ]
+    },
+    options:makeOpts({plugins:{legend:baseLegend,tooltip:{...baseTip,callbacks:{label:(ctx)=>{const d=ctx.raw;return`Cost $${d.x}K · Margin $${d.y}K`;}}},},scales:{
+      x:{...baseScales.x,min:0,max:75,title:{display:true,text:'Expedite Cost ($K)',font:{size:11},color:C.muted}},
+      y:{...baseScales.y,min:0,max:100,title:{display:true,text:'Margin Protected ($K)',font:{size:11},color:C.muted}}
+    }})
+  });
+})();
+
+// Horizontal bar — top 10 expedite decisions
+(function(){
+  const skus=['SKU-A','SKU-B','SKU-F','SKU-G','SKU-J','SKU-C','SKU-D','SKU-E','SKU-H','SKU-K'];
+  const costs=[30,22,15,18,25,50,45,55,60,48];
+  const margins=[85,68,42,55,70,20,18,22,15,25];
+  const decisions=['Expedite','Expedite','Expedite','Expedite','Expedite','Reallocate','Reallocate','Reallocate','Reallocate','Reallocate'];
+  new Chart(document.getElementById('c3_decisions'),{
+    type:'bar',
+    data:{
+      labels:skus,
+      datasets:[
+        {label:'Expedite Cost ($K)',data:costs,backgroundColor:C.crit+'99',borderRadius:3,borderSkipped:false},
+        {label:'Margin Protected ($K)',data:margins,backgroundColor:C.good+'aa',borderRadius:3,borderSkipped:false}
+      ]
+    },
+    options:makeOpts({indexAxis:'y',plugins:{legend:baseLegend,tooltip:{...baseTip,callbacks:{afterLabel:(ctx)=>{const i=ctx.dataIndex;return`Decision: ${decisions[i]}`;}}},},scales:{
+      x:{...baseScales.x,title:{display:true,text:'$K',font:{size:11},color:C.muted}},
+      y:{...baseScales.y,ticks:{color:C.muted,font:{size:11,family:'monospace'}}}
+    }})
+  });
+})();
+
+// Line — actual vs blanket expedite counterfactual
+(function(){
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const actual=[28,32,38,45,42,35,28,22,18,16,15,14];
+  const blanket=[28,36,48,72,80,68,52,40,32,28,25,22];
+  new Chart(document.getElementById('c3_freight'),{
+    type:'line',
+    data:{
+      labels:months,
+      datasets:[
+        {label:'Actual (margin-weighted)',data:actual,borderColor:C.blue,backgroundColor:C.blue+'18',fill:true,borderWidth:2.5,pointRadius:4,tension:.35},
+        {label:'Counterfactual — blanket expedite',data:blanket,borderColor:C.crit,backgroundColor:'transparent',borderWidth:2,pointRadius:0,tension:.35,borderDash:[6,4]}
+      ]
+    },
+    options:makeOpts({plugins:{legend:baseLegend,tooltip:baseTip},scales:{
+      x:baseScales.x,
+      y:{...baseScales.y,min:0,title:{display:true,text:'Air Freight Spend ($K)',font:{size:11},color:C.muted}}
+    }})
+  });
+})();
+
+// Grouped bar — regional inventory reallocation
+new Chart(document.getElementById('c3_realloc'),{
+  type:'bar',
+  data:{
+    labels:['NA','EMEA','APAC'],
+    datasets:[
+      {label:'Before Rebalancing (DoS)',data:[22,38,9],backgroundColor:C.orange+'cc',borderRadius:4,borderSkipped:false},
+      {label:'After Rebalancing (DoS)',data:[19,20,18],backgroundColor:C.good+'aa',borderRadius:4,borderSkipped:false}
+    ]
+  },
+  options:makeOpts({plugins:{legend:baseLegend,tooltip:baseTip},scales:{
+    x:baseScales.x,
+    y:{...baseScales.y,title:{display:true,text:'Days of Supply',font:{size:11},color:C.muted}}
+  }})
+});
+
+// Donut — expedite prioritization criteria weights
+new Chart(document.getElementById('c3_criteria'),{
+  type:'doughnut',
+  data:{
+    labels:['Launch Date Proximity (40%)','Customer Commitment (30%)','Margin Contribution (20%)','Product Lifecycle Stage (10%)'],
+    datasets:[{
+      data:[40,30,20,10],
+      backgroundColor:[C.crit+'cc',C.orange+'cc',C.blue+'cc',C.muted+'cc'],
+      borderWidth:2,borderColor:'#fff'
+    }]
+  },
+  options:{responsive:true,maintainAspectRatio:true,cutout:'55%',plugins:{
+    legend:{display:true,position:'right',labels:{font:{size:11},color:C.text,boxWidth:10,padding:8}},
+    tooltip:baseTip
+  }}
+});
+
+/* ────────────────────────────────────────────
+   TAB 4 — Global S&OP Cadence
+──────────────────────────────────────────── */
+
+// Horizontal bar — before vs after scorecard
+(function(){
+  const metrics=['Time on status updates','Time on decisions','Avg agenda items / meeting','Action items completed (%)','ODM template compliance (%)'];
+  const before=[80,20,12,55,62];
+  const after=[15,85,4,89,94];
+  new Chart(document.getElementById('c4_before_after'),{
+    type:'bar',
+    data:{
+      labels:metrics,
+      datasets:[
+        {label:'Before',data:before,backgroundColor:C.crit+'88',borderRadius:4,borderSkipped:false},
+        {label:'After',data:after,backgroundColor:C.good+'aa',borderRadius:4,borderSkipped:false}
+      ]
+    },
+    options:makeOpts({indexAxis:'y',plugins:{legend:baseLegend,tooltip:baseTip},scales:{
+      x:{...baseScales.x,min:0,max:100,title:{display:true,text:'%  (or count for agenda items)',font:{size:11},color:C.muted}},
+      y:{...baseScales.y,ticks:{color:C.muted,font:{size:10}}}
+    }})
+  });
+})();
+
+// Line — ODM compliance 12 weeks
+(function(){
+  const weeks=Array.from({length:12},(_,i)=>`Wk ${i+1}`);
+  const compliance=[62,65,68,72,76,80,83,87,90,92,93,94];
+  new Chart(document.getElementById('c4_odm'),{
+    type:'line',
+    data:{
+      labels:weeks,
+      datasets:[{
+        label:'ODM Submission Compliance (%)',
+        data:compliance,
+        borderColor:C.aqua,backgroundColor:C.aqua+'22',fill:true,
+        borderWidth:2.5,pointRadius:4,tension:.35
+      }]
+    },
+    options:makeOpts({plugins:{tooltip:baseTip,legend:{display:false}},scales:{
+      x:baseScales.x,
+      y:{...baseScales.y,min:50,max:100,title:{display:true,text:'Compliance (%)',font:{size:11},color:C.muted}}
+    }})
+  });
+})();
+
+// Stacked bar — S&OP agenda composition over 12 weeks
+(function(){
+  const weeks=Array.from({length:12},(_,i)=>`Wk ${i+1}`);
+  // Status % declining, decisions % rising
+  const status=[75,72,68,62,55,45,35,28,20,17,15,15];
+  const decisions=weeks.map((_,i)=>Math.min(75,100-status[i]-15));
+  const admin=weeks.map((_,i)=>100-status[i]-decisions[i]);
+  new Chart(document.getElementById('c4_evolution'),{
+    type:'bar',
+    data:{
+      labels:weeks,
+      datasets:[
+        {label:'Status Updates',data:status,backgroundColor:C.crit+'88',borderSkipped:false},
+        {label:'Decisions / Exceptions',data:decisions,backgroundColor:C.good+'aa',borderSkipped:false},
+        {label:'Admin / Process',data:admin,backgroundColor:C.muted+'66',borderSkipped:false}
+      ]
+    },
+    options:makeOpts({plugins:{legend:baseLegend,tooltip:baseTip},scales:{
+      x:{...baseScales.x,stacked:true},
+      y:{...baseScales.y,stacked:true,max:100,title:{display:true,text:'Agenda Time Share (%)',font:{size:11},color:C.muted}}
+    }})
+  });
+})();
+
+/* ────────────────────────────────────────────
+   TAB 5 — Integrated View
+──────────────────────────────────────────── */
+
+// Line (3 series) — launch fill, E&O, air freight 12 months
+(function(){
+  const months=['M1','M2','M3','M4','M5','M6','M7','M8','M9','M10','M11','M12'];
+  const fill=    [72,70,68,65,68,72,78,82,85,87,89,91];
+  const eao=     [100,108,118,128,122,112,100,88,78,70,62,58];
+  const freight= [28,32,38,45,42,35,28,22,18,16,15,14];
+  new Chart(document.getElementById('c5_triple'),{
+    type:'line',
+    data:{
+      labels:months,
+      datasets:[
+        {label:'Launch Fill Rate (% of target)',data:fill,borderColor:C.good,backgroundColor:'transparent',borderWidth:2.5,pointRadius:3,tension:.35,yAxisID:'yFill'},
+        {label:'E&O Index (M1 = 100)',data:eao,borderColor:C.orange,backgroundColor:'transparent',borderWidth:2,pointRadius:3,tension:.35,borderDash:[5,4],yAxisID:'yEao'},
+        {label:'Air Freight Spend ($K)',data:freight,borderColor:C.crit,backgroundColor:'transparent',borderWidth:2,pointRadius:3,tension:.35,borderDash:[2,3],yAxisID:'yFreight'}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:baseLegend,tooltip:baseTip},scales:{
+      x:baseScales.x,
+      yFill:{position:'left',min:60,max:100,grid:{color:C.grid,lineWidth:.5},ticks:{color:C.good,font:{size:10}},title:{display:true,text:'Fill Rate %',font:{size:10},color:C.good}},
+      yEao:{position:'right',min:40,max:140,grid:{display:false},ticks:{color:C.orange,font:{size:10}},title:{display:true,text:'E&O Index',font:{size:10},color:C.orange}},
+      yFreight:{display:false}
+    }}
+  });
+})();
+
+// Bar — cost of delay scenarios
+new Chart(document.getElementById('c5_delay'),{
+  type:'bar',
+  data:{
+    labels:['Act Immediately\n(Week 0)','Delayed 4 Weeks','Delayed 8 Weeks'],
+    datasets:[
+      {label:'Clearance Cost ($K)',data:[420,680,1050],backgroundColor:[C.good+'cc',C.warn+'cc',C.crit+'cc'],borderRadius:4,borderSkipped:false},
+      {label:'Carrying Cost Accrued ($K)',data:[0,80,210],backgroundColor:[C.good+'44',C.warn+'44',C.crit+'44'],borderRadius:4,borderSkipped:false}
+    ]
+  },
+  options:makeOpts({plugins:{legend:baseLegend,tooltip:baseTip},scales:{
+    x:baseScales.x,
+    y:{...baseScales.y,title:{display:true,text:'Total Cost ($K)',font:{size:11},color:C.muted}}
+  }})
+});
+
+// Grouped bar — cross-functional action completion
+new Chart(document.getElementById('c5_completion'),{
+  type:'bar',
+  data:{
+    labels:['Planning','Sales / GTM','Finance','ODM Partners'],
+    datasets:[
+      {label:'Before S&OP Redesign (%)',data:[58,42,61,50],backgroundColor:C.crit+'88',borderRadius:4,borderSkipped:false},
+      {label:'After S&OP Redesign (%)',data:[92,85,94,88],backgroundColor:C.good+'aa',borderRadius:4,borderSkipped:false}
+    ]
+  },
+  options:makeOpts({plugins:{legend:baseLegend,tooltip:baseTip},scales:{
+    x:baseScales.x,
+    y:{...baseScales.y,min:0,max:100,title:{display:true,text:'Action Item Completion (%)',font:{size:11},color:C.muted}}
+  }})
+});
+
+/* ────────────────────────────────────────────
+   Tab switching
+──────────────────────────────────────────── */
 document.getElementById('tabNav').addEventListener('click',e=>{
-  const btn=e.target.closest('.tab-btn');if(!btn)return;
+  const btn=e.target.closest('.tab-btn');
+  if(!btn)return;
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');
